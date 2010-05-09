@@ -1,0 +1,3 @@
+## use color in bash
+
+http://webhome.csc.uvic.ca/~sae/seng265/fall04/tips/s265s047-tips/bash-using-colors.html
