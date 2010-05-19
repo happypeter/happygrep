@@ -1,3 +1,21 @@
 ## use color in bash
 
 http://webhome.csc.uvic.ca/~sae/seng265/fall04/tips/s265s047-tips/bash-using-colors.html
+
+
+## grep 
+
+[0-9a-f][0-9a-f] : two hex bit
+
+	peter@bull:~$ grep [0-9a-f][0-9a-f] test 
+	12
+	aa
+	1a
+	peter@bull:~$ cat test 
+	12
+	1
+	aa
+	1a
+
+	peter@bull:~$ 
+
