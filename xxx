@@ -1,3 +1,6 @@
 
 find . -exec grep "$1" '{}' \; -print|vim -s /usr/share/vim/vim72/syntax/search.vim -
 
+# echo "text for vim" |vim -
+# read from stdout
+
