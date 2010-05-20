@@ -2,11 +2,10 @@
 :hi link PETER Statement
 :syntax match FILENAME /\.\/[a-z]*/ 
 :hi link FILENAME Statement  
+" ref: http://vimdoc.sourceforge.net/htmldoc/usr_44.html
 i 
 
- hello  peter
-" but I also need to know how to highlight a regexp like ./filename
-# you
+hello  peter
 
 ./filename
 
