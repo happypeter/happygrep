@@ -30,7 +30,7 @@ find a word, case ignored
 
 then I can do some highliting automatically
 
-and anything I want later manuually
+and anything I want later manually
 
 	peter@bull:~$ cat v.vim 
 	i  hello
@@ -44,6 +44,4 @@ and anything I want later manuually
 
 ## how to install search.vim
 
-	peter@bull:~/ttt$ xxx hello
-	Cannot open for reading: "search.vim"
 
