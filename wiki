@@ -26,3 +26,8 @@ find a word, case ignored
 	hello my love
 	Hello
 
+## pipe the output to vim
+
+then I can do some highliting automatically
+
+and anything I want later manuually
