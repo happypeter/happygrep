@@ -31,3 +31,14 @@ find a word, case ignored
 then I can do some highliting automatically
 
 and anything I want later manuually
+
+	peter@bull:~$ cat v.vim 
+	i  hello
+
+	peter@bull:~$ vim -s v.vim newfile
+	peter@bull:~$ cat newfile 
+	  hello
+
+
+	peter@bull:~$ 
+
