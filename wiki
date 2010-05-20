@@ -19,3 +19,10 @@ http://webhome.csc.uvic.ca/~sae/seng265/fall04/tips/s265s047-tips/bash-using-col
 
 	peter@bull:~$ 
 
+find a word, case ignored
+
+	peter@bull:~$ grep -i  '\<hello\>'  dd
+	hello
+	hello my love
+	Hello
+
