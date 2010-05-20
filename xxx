@@ -1,4 +1,3 @@
 
-find . -exec grep "$1" '{}' \; -print >result.txt
-vim -s search.vim result.txt
+find . -exec grep "$1" '{}' \; -print|vim -s /usr/share/vim/vim72/syntax/search.vim -
 

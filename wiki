@@ -42,3 +42,8 @@ and anything I want later manuually
 
 	peter@bull:~$ 
 
+## how to install search.vim
+
+	peter@bull:~/ttt$ xxx hello
+	Cannot open for reading: "search.vim"
+
