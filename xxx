@@ -3,4 +3,5 @@ find . -exec grep "$1" '{}' \; -print|vim -s /usr/share/vim/vim72/syntax/search.
 
 # echo "text for vim" |vim -
 # read from stdout
-
+# find . -exec grep peter {} \; -printf "FILENAME:\n" -print|vim -
+# the above "-printf" may help with navigation in vim
