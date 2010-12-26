@@ -5,3 +5,8 @@ find . -exec grep "$1" '{}' \; -print|vim -s /usr/share/vim/vim72/syntax/search.
 # read from stdout
 # find . -exec grep peter {} \; -printf "FILENAME:\n" -print|vim -
 # the above "-printf" may help with navigation in vim
+# and now I have this to avoid the items in .git/
+#
+#    find . |grep -v .git| xargs grep -in tig
+#
+#
