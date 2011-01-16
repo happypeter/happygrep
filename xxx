@@ -1,6 +1,9 @@
 
 find . -exec grep "$1" '{}' \; -print|vim -s /usr/share/vim/vim72/syntax/search.vim -
 
+find . -type d -name zoo -prune -o \( \! -name ddd \) -exec grep "$1" '{}' \; -print
+
+
 # echo "text for vim" |vim -
 # read from stdout
 # find . -exec grep peter {} \; -printf "FILENAME:\n" -print|vim -
