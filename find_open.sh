@@ -61,6 +61,10 @@ vim +${linenumber[2]} ${thefilename[2]};;
 vim +${linenumber[3]} ${thefilename[3]};;
 4)
 vim +${linenumber[4]} ${thefilename[4]};;
+5)
+vim +${linenumber[5]} ${thefilename[5]};;
+6)
+vim +${linenumber[6]} ${thefilename[6]};;
 esac
 
 rm output_file
