@@ -6,7 +6,7 @@ mv $PWD'/'.git ~/git_tmp 2>/dev/null
 data=`find . -exec grep -in "$1" {} \; -print`
 echo "$data">>ttt
 
-mv ~/git_tmp .git
+mv ~/git_tmp .git 2>/dev/null # this is not save
 
 tac ttt > reversed ## reverse lines in the file
 rm ttt
