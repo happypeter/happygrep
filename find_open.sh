@@ -41,15 +41,16 @@ declare -a linenumber
 
 foo=0
 while read line; do 
-    echo NO.$(( ++foo ))
+    echo -e "\033[1m NO.$(( ++foo )):\033[0m"
     thefilename[$foo]=`echo $line|awk -F":" '{print $1}'`
     linenumber[$foo]=`echo $line|awk -F":" '{print $2}'`
     linecontent=`echo $line|awk -F":" '{print $3}'`
     echo '    ' $linecontent
 done < output_file
 
-
-echo -n " Now which one do you want to open? "
+echo 
+echo 
+echo -n " Now which one do you want to open? [1,2,3...]  "
 read nnn
 
 case $nnn in
