@@ -16,8 +16,16 @@ echo "$data">>ttt
 
 mv ~/git_tmp .git 2>/dev/null # FIXME:this is not save
 
+ttt_content=`cat ttt`
+
+if [ -z "$ttt_content" ]
+then
+    echo  no match
+    exit ## ttt is empty, so no match
+fi
+
 tac ttt > reversed ## reverse lines in the file
-rm ttt
+#rm ttt
 
 ##############
 #
@@ -81,4 +89,4 @@ vim +${linenumber[7]} ${thefilename[7]};;
 vim +${linenumber[8]} ${thefilename[8]};;
 esac
 
-rm output_file
+#rm output_file
