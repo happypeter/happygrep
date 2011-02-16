@@ -1,5 +1,10 @@
 #!/bin/bash
 
+#################################
+#
+#    usage error
+#    
+#################################
 if [ $# -eq 0 ] 
 then
     echo """
@@ -9,7 +14,12 @@ then
     exit 1
 fi
 
-
+#################################
+#
+#    the xxx method 
+#    
+#################################
+>output_file
 mv $PWD'/'.git ~/git_tmp 2>/dev/null
 data=`find . -exec grep -in "$1" {} \; -print`
 echo "$data">>ttt
@@ -21,17 +31,18 @@ ttt_content=`cat ttt`
 if [ -z "$ttt_content" ]
 then
     echo  no match
+    rm ttt
     exit ## ttt is empty, so no match
 fi
 
 tac ttt > reversed ## reverse lines in the file
-#rm ttt
+rm ttt
 
-##############
+#################################
 #
-# handle the reversed file
-#
-###############
+#    process reversed
+#    
+#################################
 while read line; do 
 echo $line|grep ^./ &>/dev/null # serch the line that begins with "./", that is the filename
 
@@ -46,11 +57,12 @@ done < reversed
 
 rm reversed
 
-#############
+
+#################################
 #
-#   get info out of output_file
-#
-############
+#    process output_file
+#    
+#################################
 
 declare -a thefilename
 declare -a linenumber
@@ -64,6 +76,13 @@ while read line; do
     echo ${thefilename[$foo]}
     echo '    ' $linecontent
 done < output_file
+rm output_file
+
+#################################
+#
+#    choose
+#    
+#################################
 
 echo 
 echo 
@@ -89,4 +108,3 @@ vim +${linenumber[7]} ${thefilename[7]};;
 vim +${linenumber[8]} ${thefilename[8]};;
 esac
 
-#rm output_file
