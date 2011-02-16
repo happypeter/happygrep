@@ -44,7 +44,7 @@ while read line; do
     echo -e "\033[1m NO.$(( ++foo )):\033[0m"
     thefilename[$foo]=`echo $line|awk -F":" '{print $1}'`
     linenumber[$foo]=`echo $line|awk -F":" '{print $2}'`
-    linecontent=`echo $line|awk -F":" '{print $3}'`
+    linecontent=`echo $line|awk -F":" '{print $3}'` # FIXME:it is possible to have "http://xxx" as content
     echo '    ' $linecontent
 done < output_file
 
