@@ -17,8 +17,7 @@ rm ttt
 #
 ###############
 while read line; do 
-echo $line # or whaterver you want to do with the $line variable
-echo $line|grep ^./  # serch the line that begins with "./", that is the filename
+echo $line|grep ^./ &>/dev/null # serch the line that begins with "./", that is the filename
 
 if [ $? -eq 0 ]
 then
@@ -42,11 +41,11 @@ declare -a linenumber
 
 foo=0
 while read line; do 
-    echo $(( ++foo ))
-    echo $line
+    echo NO.$(( ++foo ))
     thefilename[$foo]=`echo $line|awk -F":" '{print $1}'`
     linenumber[$foo]=`echo $line|awk -F":" '{print $2}'`
-    echo ${thefilename[$foo]} xxx---xxx ${linenumber[$foo]}
+    linecontent=`echo $line|awk -F":" '{print $3}'`
+    echo '    ' $linecontent
 done < output_file
 
 
