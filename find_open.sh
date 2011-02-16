@@ -1,5 +1,14 @@
 #!/bin/bash
 
+if [ $# -eq 0 ] 
+then
+    echo """
+    usage:
+        xxx string
+    """
+    exit 1
+fi
+
 >output_file
 
 mv $PWD'/'.git ~/git_tmp 2>/dev/null
@@ -67,6 +76,10 @@ vim +${linenumber[4]} ${thefilename[4]};;
 vim +${linenumber[5]} ${thefilename[5]};;
 6)
 vim +${linenumber[6]} ${thefilename[6]};;
+7)
+vim +${linenumber[7]} ${thefilename[7]};;
+8)
+vim +${linenumber[8]} ${thefilename[8]};;
 esac
 
 rm output_file
