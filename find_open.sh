@@ -2,7 +2,7 @@
 
 >output_file
 
-mv .git ~/git_tmp
+mv $PWD'/'.git ~/git_tmp 2>/dev/null
 data=`find . -exec grep -in "$1" {} \; -print`
 echo "$data">>ttt
 
