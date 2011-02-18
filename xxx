@@ -49,7 +49,7 @@ while read line; do
     # FIXME: the above works when the line has "http://xxx" as content, still buggy
     
     echo ${thefilename[$count]}
-    printf "\t $linecontent" # echo will expand special characters like * 
+    printf "\t $linecontent \n" # echo will expand special characters like * 
 done < output_file
 rm output_file
 
