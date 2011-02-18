@@ -45,3 +45,18 @@ and anything I want later manually
 ## how to install search.vim
 
 
+
+find . -exec grep "$1" '{}' \; -print|vim -s /usr/share/vim/vim72/syntax/search.vim -
+
+find . -type d -name zoo -prune -o \( \! -name ddd \) -exec grep "$1" '{}' \; -print
+
+
+# echo "text for vim" |vim -
+# read from stdout
+# find . -exec grep peter {} \; -printf "FILENAME:\n" -print|vim -
+# the above "-printf" may help with navigation in vim
+# and now I have this to avoid the items in .git/
+#
+#    find . |grep -v .git| xargs grep -in tig
+#
+#
