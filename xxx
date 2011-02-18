@@ -63,9 +63,14 @@ rm output_file
 
 echo 
 echo 
-echo -n " Now which one do you want to open? [1,2,3...]  "
+echo -n " Now which one do you want to open? [1,2,3...$count]  "
 read nu
 
-# FIXME need to make sure  nu > 0 && nu < $linenumber
 
-vim +${linenumber[$nu]} ${thefilename[$nu]}
+if [ $nu -gt 0 -a $nu -lt $(($count+1)) 2> /dev/null ] ## stderr output when $nu is not a number
+then 
+    vim +${linenumber[$nu]} ${thefilename[$nu]}
+else 
+    echo wrong nu
+fi
+
