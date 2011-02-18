@@ -71,7 +71,9 @@ while read line; do
     echo -ne "\033[1m NO.$(( ++count )):\033[0m"
     thefilename[$count]=`echo $line|awk -F":" '{print $1}'`
     linenumber[$count]=`echo $line|awk -F":" '{print $2}'`
-    linecontent=`echo $line|awk -F":" '{print $3}'` # FIXME:it is possible to have "http://xxx" as content
+    linecontent=`echo $line|awk -F":" '{print $3 ":" $4}'` 
+    # FIXME: the above works when the line has "http://xxx" as content, still buggy
+    
     echo ${thefilename[$count]}
     echo '    ' $linecontent
 done < output_file
