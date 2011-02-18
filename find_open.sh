@@ -89,22 +89,24 @@ echo
 echo -n " Now which one do you want to open? [1,2,3...]  "
 read nnn
 
-case $nnn in
-1)
-vim +${linenumber[1]} ${thefilename[1]};;
-2)
-vim +${linenumber[2]} ${thefilename[2]};;
-3)
-vim +${linenumber[3]} ${thefilename[3]};;
-4)
-vim +${linenumber[4]} ${thefilename[4]};;
-5)
-vim +${linenumber[5]} ${thefilename[5]};;
-6)
-vim +${linenumber[6]} ${thefilename[6]};;
-7)
-vim +${linenumber[7]} ${thefilename[7]};;
-8)
-vim +${linenumber[8]} ${thefilename[8]};;
-esac
-
+vim +${linenumber[$nnn]} ${thefilename[$nnn]}
+#
+#case $nnn in
+#1)
+#vim +${linenumber[1]} ${thefilename[1]};;
+#2)
+#vim +${linenumber[2]} ${thefilename[2]};;
+#3)
+#vim +${linenumber[3]} ${thefilename[3]};;
+#4)
+#vim +${linenumber[4]} ${thefilename[4]};;
+#5)
+#vim +${linenumber[5]} ${thefilename[5]};;
+#6)
+#vim +${linenumber[6]} ${thefilename[6]};;
+#7)
+#vim +${linenumber[7]} ${thefilename[7]};;
+#8)
+#vim +${linenumber[8]} ${thefilename[8]};;
+#esac
+##
