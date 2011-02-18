@@ -26,7 +26,7 @@ echo "$data">output_file
 
 if [ -z "$data" ] ## output_file is empty, so no match, quit
 then
-    echo  no match
+    echo  No match, bye!
     rm output_file 
     exit 
 fi
@@ -63,5 +63,7 @@ echo
 echo 
 echo -n " Now which one do you want to open? [1,2,3...]  "
 read nu
+
+# FIXME need to make sure  nu > 0 && nu < $linenumber
 
 vim +${linenumber[$nu]} ${thefilename[$nu]}
