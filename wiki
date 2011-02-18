@@ -26,29 +26,12 @@ find a word, case ignored
 	hello my love
 	Hello
 
-## pipe the output to vim
-
-then I can do some highliting automatically
-
-and anything I want later manually
-
-	peter@bull:~$ cat v.vim 
-	i  hello
-
-	peter@bull:~$ vim -s v.vim newfile
-	peter@bull:~$ cat newfile 
-	  hello
-
-
-	peter@bull:~$ 
-
 ## how to install search.vim
 
 
 
 find . -exec grep "$1" '{}' \; -print|vim -s /usr/share/vim/vim72/syntax/search.vim -
 
-find . -type d -name zoo -prune -o \( \! -name ddd \) -exec grep "$1" '{}' \; -print
 
 
 # echo "text for vim" |vim -
