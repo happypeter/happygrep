@@ -13,49 +13,23 @@ then
     exit 1
 fi
 
+>output_file # clear old data
+
 #################################
 #
-#    the old xxx method 
+#    billie's xxx
 #    
 #################################
->output_file
-mv $PWD'/'.git ~/git_tmp 2>/dev/null
-data=`find . -exec grep -in "$1" {} \; -print`
-echo "$data">>ttt
 
-mv ~/git_tmp .git 2>/dev/null # FIXME:this is not save
+data=`find . -type d -name .git -prune -o \( \! -name ddd \) -exec grep -in "$1" {} + `
+echo "$data">output_file
 
-ttt_content=`cat ttt`
-
-if [ -z "$ttt_content" ]
+if [ -z "$data" ] ## output_file is empty, so no match, quit
 then
     echo  no match
-    rm ttt
-    exit ## ttt is empty, so no match, quit
+    rm output_file 
+    exit 
 fi
-
-tac ttt > reversed ## reverse lines in the file
-rm ttt
-
-#################################
-#
-#    process reversed
-#    
-#################################
-while read line; do 
-echo $line|grep ^./ &>/dev/null # serch the line that begins with "./", that is the filename
-
-if [ $? -eq 0 ]
-then
-    filename=$line # if the line is a filename, then update filename
-else
-    echo $filename':'$line >>output_file # otherwise, add the filename to the lines below it
-fi
-
-done < reversed
-
-rm reversed
-
 
 #################################
 #
