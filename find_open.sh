@@ -86,6 +86,6 @@ rm output_file
 echo 
 echo 
 echo -n " Now which one do you want to open? [1,2,3...]  "
-read nnn
+read nu
 
-vim +${linenumber[$nnn]} ${thefilename[$nnn]}
+vim +${linenumber[$nu]} ${thefilename[$nu]}
