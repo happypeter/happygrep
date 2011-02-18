@@ -45,8 +45,10 @@ while read line; do
     echo -ne "\033[1m NO.$(( ++count )):\033[0m"
     thefilename[$count]=`echo $line|awk -F":" '{print $1}'`
     linenumber[$count]=`echo $line|awk -F":" '{print $2}'`
-    linecontent=`echo $line|awk -F":" '{print $3 ":" $4}'` 
-    # FIXME: the above works when the line has "http://xxx" as content, still buggy
+
+    linecontent=`echo $line|sed 's/^\.\/[a-z1-9]*:[a-z1-9]*://'` 
+    # "./filename:linmumber:linecontent" -> "linecontent"
+    # can not use awk {print $3}, because we may have "http://www..."
     
     echo ${thefilename[$count]}
     printf "\t $linecontent \n" # echo will expand special characters like * 
