@@ -43,16 +43,16 @@ declare -a linenumber
 count=0
 while read line; do 
     echo -ne "\033[1m NO.$(( ++count )):\033[0m"
-    thefilename[$count]=`echo $line|awk -F":" '{print $1}'`
-    linenumber[$count]=`echo $line|awk -F":" '{print $2}'`
+    thefilename[$count]=`echo "$line"|awk -F":" '{print $1}'`
+    linenumber[$count]=`echo "$line"|awk -F":" '{print $2}'`
 
-    linecontent=`echo $line|sed 's/^[^ ]*:[1-9]*://'` ## [^ ] matches any charater other than SPACE
+    linecontent=`echo "$line"|sed 's/^[^ ]*:[1-9]*://'` ## [^ ] matches any charater other than SPACE
     # http://en.wikipedia.org/wiki/Regular_expression
     # "./filename:linmumber:linecontent" -> "linecontent"
     # can not use awk {print $3}, because we may have "http://www..."
     
     echo ${thefilename[$count]}
-    printf "\t $linecontent \n" # echo will expand special characters like * 
+    echo "    $linecontent"  # echo will expand special characters like *, unless you add "" 
 done < output_file
 rm output_file
 
