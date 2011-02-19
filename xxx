@@ -54,6 +54,10 @@ while read line; do
     echo ${thefilename[$count]}
     echo "    $linecontent"  # echo will expand special characters like *, unless you add "" 
 done < output_file
+
+# FIXME: if the program dies in the middle, like Ctr-C is used, the
+# output_file won't be removed
+
 rm output_file
 
 #################################
