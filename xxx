@@ -40,7 +40,7 @@ fi
 #    
 #################################
 
-sed -i 's/\\$//g' output_file ## FIXME: if there are lines like "text \\", this won't work
+sed -i 's/[\\]*$//g' output_file ## NOTE: it does not matter if there are spaces after '\' in source file
 
 #################################
 #
@@ -69,7 +69,7 @@ done < output_file
 # FIXME: if the program dies in the middle, like Ctr-C is used, the
 # output_file won't be removed
 
-#rm output_file
+rm output_file
 
 #################################
 #
