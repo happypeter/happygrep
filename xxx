@@ -31,6 +31,17 @@ then
     exit 
 fi
 
+
+#################################
+#
+#    now remove training "\"
+#    otherwise the below "read line" 
+#    will read two lines as one
+#    
+#################################
+
+sed -i 's/\\$//g' output_file ## FIXME: if there are lines like "text \\", this won't work
+
 #################################
 #
 #    process output_file
@@ -58,7 +69,7 @@ done < output_file
 # FIXME: if the program dies in the middle, like Ctr-C is used, the
 # output_file won't be removed
 
-rm output_file
+#rm output_file
 
 #################################
 #
