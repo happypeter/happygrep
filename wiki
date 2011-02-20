@@ -1,9 +1,8 @@
-## use color in bash
+## Regexp
 
-http://webhome.csc.uvic.ca/~sae/seng265/fall04/tips/s265s047-tips/bash-using-colors.html
+    .     matches any character
+    .*    matches any set of characters
 
-
-## grep 
 
 [0-9a-f][0-9a-f] : two hex bit
 
@@ -26,6 +25,9 @@ find a word, case ignored
 	hello my love
 	Hello
 
+## use color in bash
+
+http://webhome.csc.uvic.ca/~sae/seng265/fall04/tips/s265s047-tips/bash-using-colors.html
 ## how to install search.vim
 
 

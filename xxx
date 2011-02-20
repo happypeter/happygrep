@@ -57,7 +57,7 @@ while read line; do
     thefilename[$count]=`echo "$line"|awk -F":" '{print $1}'`
     linenumber[$count]=`echo "$line"|awk -F":" '{print $2}'`
 
-    linecontent=`echo "$line"|sed 's/^[^ ]*:[0-9]*://'` ## [^ ] matches any charater other than SPACE
+    linecontent=`echo "$line"|sed 's/^.*:[0-9]*://'` ## .* matches any set of charaters
     # http://en.wikipedia.org/wiki/Regular_expression
     # "./filename:linmumber:linecontent" -> "linecontent"
     # can not use awk {print $3}, because we may have "http://www..."
