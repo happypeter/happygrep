@@ -105,9 +105,8 @@ do
     read nu
     if [ $nu -gt 0 -a $nu -lt $(($count+1)) 2> /dev/null ] ## stderr output when $nu is not a number
     then 
+# return to main window to select a number, then use ctrl+c to cancel
         vim +${linenumber[$nu]} ${thefilename[$nu]}
-        echo byebye
-        exit
     else 
         echo wrong nu, input again.
     fi
