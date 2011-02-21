@@ -1,3 +1,7 @@
+## ncurses
+
+you can get ncurses api doc by moving your cursor on it and K (open man page) in vim
+
 ## Regexp
 
     .     matches any character
