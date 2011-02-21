@@ -84,7 +84,7 @@ main(int argc, char *argv[])
 	mvprintw(y - 1, 0, "%s", "press 'q' to quit");
 
 	{
-		FILE *rev_list = popen("git-rev-list $(git-rev-parse --since=1.month) HEAD", "r");
+		FILE *rev_list = popen("git diff HEAD^", "r");
 		char buffer[BUFSIZ];
 		char *line;
 		int lineno = 1;
