@@ -17,8 +17,7 @@
 static void quit(int sig)
 {
 	endwin();
-    printw("printw quit");
-    printf("printw quit");
+    printf("printf quit\n");
 
 	/* do your non-curses wrapup here */
 
