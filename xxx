@@ -81,7 +81,7 @@ while read line; do
     # "./filename:linmumber:linecontent" -> "linecontent"
     # can not use awk {print $3}, because we may have "http://www..."
     
-    echo ${thefilename[$count]}
+    echo ${thefilename[$count]}:${linenumber[$count]}
     echo "    $linecontent"  # echo will expand special characters like *, unless you add "" 
 done < output_file
 
