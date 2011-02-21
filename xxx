@@ -17,6 +17,23 @@ fi
 
 #################################
 #
+#    on_die
+#    
+#################################
+on_die()
+{
+
+rm output_file &>/dev/null
+echo
+echo mission canceled, bye.
+exit 0
+
+}
+
+trap 'on_die' INT # Ctr-c sent SIGINT
+
+#################################
+#
 #    billie's xxx
 #    
 #################################
