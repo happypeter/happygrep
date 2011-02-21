@@ -38,7 +38,8 @@ trap 'on_die' INT # Ctr-c sent SIGINT
 #    
 #################################
 
-data=`find . -type d -name .git -prune -o \( \! -name *.swp \) -exec grep -in "$1" {} + `
+data=`find . -name .git -prune -o \( \! -name *.swp \) -exec grep -in "$1" {} +`
+# according to examples from the end of man find 
 # *.swp , now I do not need to stop vim to run xxx, and I can use ':sh' in vim
 echo "$data">output_file
 
