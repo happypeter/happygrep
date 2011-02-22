@@ -12,6 +12,7 @@
 static void init_colors(void);
 static void quit(int sig);
 static void init(void);
+static void scroll_view(/* win */ int request);
 
 /*
  * Main
@@ -78,6 +79,12 @@ main(int argc, char *argv[])
                 reset_prog_mode();
                 //refresh();                 /* restore save modes, repaint screen */
                 break;
+            case 'k':
+                scroll_view(c);           
+                break;
+            case 'j':
+                scroll_view(c);           
+                break;
 
             default:
                 if (isprint(c) || isspace(c))
@@ -132,4 +139,26 @@ init(void)
     {
 		init_colors();
     }
+}
+static void
+scroll_view(/* win */ int request)
+{
+    int lines = 0;
+    switch (request) 
+    {
+        case 'j':
+            lines = 1;
+            break;
+        case 'k':
+            lines = -1;
+            break;
+        default:
+            lines = 0;
+    }
+    if (lines) 
+    {
+        wscrl(stdscr, lines);
+    }
+	redrawwin(stdscr);
+	wrefresh(stdscr);
 }
