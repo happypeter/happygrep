@@ -79,10 +79,8 @@ main(int argc, char *argv[])
                 reset_prog_mode();
                 //refresh();                 /* restore save modes, repaint screen */
                 break;
-            case 'k':
-                scroll_view(c);           
-                break;
             case 'j':
+            case 'k':
                 scroll_view(c);           
                 break;
 
