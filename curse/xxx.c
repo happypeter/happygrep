@@ -57,7 +57,6 @@ main(int argc, char *argv[])
 		}
 	}
 	attrset(A_NORMAL);
-/*        scrollok();*/
 
 	for (;;) 
     {
