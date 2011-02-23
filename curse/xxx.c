@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 
     // give some output
     p_main_view->render = default_renderer;
-    p_main_view->pipe = popen("git diff HEAD^", "r");
+    p_main_view->pipe = popen("git log", "r");
     p_main_view->win = stdscr;
     printw("popen OK");
     update_view(p_main_view);
@@ -169,15 +169,30 @@ static void init(void)
 }
 static void scroll_view(struct view *view, int request)
 {
-    int lines = 0;
+    int lines = 1;
     int y, x;
+	getmaxyx(view->win, y, x);
     switch (request) 
     {
         case 'j':
             lines = 1;
+            if (view->offset + lines > view->lines)
+                lines = view->lines - view->offset - 1;
+
+            if (lines == 0 || view->offset + y >= view->lines) {
+                printw("already at last line");
+                return;
+            }
             break;
         case 'k':
             lines = -1;
+            if (lines > view->offset)
+                lines = view->offset;
+
+            if (lines == 0) {
+                printw("already at first line");
+                return;
+            }
             break;
         default:
             lines = 0;
@@ -185,7 +200,6 @@ static void scroll_view(struct view *view, int request)
     if (lines == 1) 
     {
         wscrl(stdscr, lines);
-        getmaxyx(stdscr, y, x);
         view->render(view, y - lines);
     }
     else if (lines == -1)
@@ -198,6 +212,11 @@ static void scroll_view(struct view *view, int request)
     {
         printw("sth wrong!!");
     }
+	if (view->lineno < view->offset)
+		view->lineno = view->offset;
+	if (view->lineno > view->offset + y)
+		view->lineno = view->offset + y;
+	view->offset += lines;
 	redrawwin(stdscr);
 	wrefresh(stdscr);
 }
