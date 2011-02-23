@@ -26,8 +26,11 @@ static void init(void);
  * view
  */
 struct view {
+	char *name;
 	char *cmd;
 
+	/* Rendering */
+	int (*render)(struct view *, int);
 	WINDOW *win;
 
 	/* Navigation */
@@ -45,8 +48,9 @@ static struct view main_view;
 struct view *p_main_view = &main_view; // we only need one view for now 
 static int  update_view(struct view *view);
 static void end_update(struct view *view);
-static void scroll_view(/* win */ int request);
-static int renderer(int lineno);   
+static void scroll_view(struct view *view, int request);
+static void redraw_view(struct view *view);
+static int default_renderer(struct view *view, int lineno);
 
 /*
  * Main
@@ -77,6 +81,12 @@ int main(int argc, char *argv[])
 
 	attrset(A_NORMAL);
 
+    // give some output
+    p_main_view->render = default_renderer;
+    p_main_view->pipe = popen("git diff HEAD^", "r");
+    printw("popen OK");
+    update_view(p_main_view);
+
 	for (;;) 
     {
 		int c = getch();     /* refresh, accept single keystroke of input */
@@ -84,11 +94,6 @@ int main(int argc, char *argv[])
 		/* Process the command keystroke */
 		switch (c) 
         {
-            case 'd':
-                p_main_view->pipe = popen("git diff HEAD^", "r");
-                printw("popen OK");
-                update_view(p_main_view);
-                break;
             case 'q':
                 quit(0);
                 return 0;
@@ -104,7 +109,7 @@ int main(int argc, char *argv[])
                 break;
             case 'j':
             case 'k':
-                scroll_view(c);           
+                scroll_view(p_main_view,c);           
                 break;
 
             default:
@@ -161,7 +166,7 @@ static void init(void)
 		init_colors();
     }
 }
-static void scroll_view(/* win */ int request)
+static void scroll_view(struct view *view, int request)
 {
     int lines = 0;
     int y, x;
@@ -180,13 +185,13 @@ static void scroll_view(/* win */ int request)
     {
         wscrl(stdscr, lines);
         getmaxyx(stdscr, y, x);
-        renderer(y - lines);
+        view->render(view, y - lines);
     }
     else if (lines == -1)
     {
     
         wscrl(stdscr, lines);
-        renderer(0);
+        view->render(view, 0);
     }
     else 
     {
@@ -194,12 +199,6 @@ static void scroll_view(/* win */ int request)
     }
 	redrawwin(stdscr);
 	wrefresh(stdscr);
-}
-static int renderer(int lineno)
-{
-
-    mvprintw(lineno, 0, "renderer--------renderer");
-
 }
 /** 
 * @brief clean up work, after things 
@@ -271,4 +270,33 @@ static void end_update(struct view *view)
 {
 	pclose(view->pipe);
 	view->pipe = NULL;
+}
+static void redraw_view(struct view *view)
+{
+	int lineno;
+	int lines, cols;
+
+	wclear(view->win);
+	wmove(view->win, 0, 0);
+
+	getmaxyx(view->win, lines, cols);
+
+	for (lineno = 0; lineno < lines; lineno++) {
+		view->render(view, lineno);
+	}
+
+	redrawwin(view->win);
+	wrefresh(view->win);
+}
+static int default_renderer(struct view *view, int lineno)
+{
+	char *line;
+	int i;
+
+	line = view->line[view->offset + lineno];
+	if (!line) return FALSE;
+
+	mvwprintw(view->win, lineno, 0, "%4d: %s", view->offset + lineno, line);
+
+	return TRUE;
 }
