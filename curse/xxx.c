@@ -13,6 +13,7 @@ static void init_colors(void);
 static void quit(int sig);
 static void init(void);
 static void scroll_view(/* win */ int request);
+static int renderer(int lineno);   
 
 /*
  * Main
@@ -141,6 +142,7 @@ static void
 scroll_view(/* win */ int request)
 {
     int lines = 0;
+    int y, x;
     switch (request) 
     {
         case 'j':
@@ -155,7 +157,15 @@ scroll_view(/* win */ int request)
     if (lines) 
     {
         wscrl(stdscr, lines);
+        getmaxyx(stdscr, y, x);
+        renderer(y - lines);
     }
 	redrawwin(stdscr);
 	wrefresh(stdscr);
+}
+static int renderer(int lineno)
+{
+
+mvprintw(lineno, 0, "renderer--------renderer");
+
 }
