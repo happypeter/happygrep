@@ -19,8 +19,7 @@ static int renderer(int lineno);
  * Main
  */
 
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	int x, y;
 
@@ -94,8 +93,7 @@ main(int argc, char *argv[])
 	quit(0);
 }
 
-static void 
-quit(int sig)
+static void quit(int sig)
 {
 	endwin();
     printf("printf quit\n");
@@ -105,8 +103,7 @@ quit(int sig)
 	exit(0);
 }
 
-static void
-init_colors(void)
+static void init_colors(void)
 {
 	start_color();
 
@@ -120,8 +117,7 @@ init_colors(void)
 	init_pair(COLOR_YELLOW,	 COLOR_YELLOW,	COLOR_BLACK);
 }
 
-static void
-init(void)
+static void init(void)
 {
     signal(SIGINT, quit);      /* arrange interrupts to terminate */
     // when you <Ctr-c>, SIGINT is sent to this process, and quit() is called
@@ -138,8 +134,7 @@ init(void)
 		init_colors();
     }
 }
-static void
-scroll_view(/* win */ int request)
+static void scroll_view(/* win */ int request)
 {
     int lines = 0;
     int y, x;
