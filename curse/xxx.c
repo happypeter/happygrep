@@ -84,6 +84,7 @@ int main(int argc, char *argv[])
     // give some output
     p_main_view->render = default_renderer;
     p_main_view->pipe = popen("git diff HEAD^", "r");
+    p_main_view->win = stdscr;
     printw("popen OK");
     update_view(p_main_view);
 
