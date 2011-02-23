@@ -12,6 +12,39 @@
 static void init_colors(void);
 static void quit(int sig);
 static void init(void);
+/* 
+ * commands
+ */
+
+#define DIFF_CMD	\
+	"git log --stat -n1 %s ; echo; " \
+	"git diff --find-copies-harder -B -C %s^ %s"
+
+#define LOG_CMD	\
+	"git log --stat -n100 %s"
+/*
+ * view
+ */
+struct view {
+	char *cmd;
+
+	WINDOW *win;
+
+	/* Navigation */
+	unsigned long offset;	/* Offset of the window top */
+	unsigned long lineno;	/* Current line number */
+
+	/* Buffering */
+	unsigned long lines;	/* Total number of lines */
+	char **line;		/* Line index */
+
+	/* Loading */
+	FILE *pipe;
+};
+static struct view main_view;
+struct view *p_main_view = &main_view; // we only need one view for now 
+static int  update_view(struct view *view);
+static void end_update(struct view *view);
 static void scroll_view(/* win */ int request);
 static int renderer(int lineno);   
 
@@ -42,20 +75,6 @@ int main(int argc, char *argv[])
 	addch(ACS_HLINE);
 	mvprintw(y - 1, 0, "%s", "press 'q' to quit");
 
-	{
-		FILE *rev_list = popen("git diff HEAD^", "r");
-		char buffer[BUFSIZ];
-		char *line;
-		int lineno = 1;
-
-		while ((line = fgets(buffer, sizeof(buffer), rev_list))) {
-			move(lineno, 0);
-			printw("%2d: ", lineno++);
-			addch(ACS_LTEE);
-			addch(ACS_HLINE);
-			addstr(line);
-		}
-	}
 	attrset(A_NORMAL);
 
 	for (;;) 
@@ -65,6 +84,11 @@ int main(int argc, char *argv[])
 		/* Process the command keystroke */
 		switch (c) 
         {
+            case 'd':
+                p_main_view->pipe = popen("git diff HEAD^", "r");
+                printw("popen OK");
+                update_view(p_main_view);
+                break;
             case 'q':
                 quit(0);
                 return 0;
@@ -85,7 +109,10 @@ int main(int argc, char *argv[])
 
             default:
                 if (isprint(c) || isspace(c))
+                {
                     addch(c);
+                }
+                break;
 		}
 
 	}
@@ -173,4 +200,75 @@ static int renderer(int lineno)
 
     mvprintw(lineno, 0, "renderer--------renderer");
 
+}
+/** 
+* @brief clean up work, after things 
+* 
+* @param view : the big sturct
+*/
+static int update_view(struct view *view)
+{
+    printf("hello printf\n");
+    printw("hello printw\n");
+	char buffer[BUFSIZ];
+	char *line;
+	int lines, cols;
+	char **tmp;
+	int redraw;
+    printf("hello printf\n");
+    printw("hello printw\n");
+
+	if (!view->pipe)
+		return TRUE;
+
+	getmaxyx(stdscr, lines, cols);
+
+	redraw = !view->line;
+
+	tmp = realloc(view->line, sizeof(*view->line) * (view->lines + lines));
+	if (!tmp)
+		goto alloc_error;
+
+	view->line = tmp;
+
+	while ((line = fgets(buffer, sizeof(buffer), view->pipe))) {
+		int linelen;
+
+		if (!lines--)
+			break;
+
+		linelen = strlen(line);
+		if (linelen)
+			line[linelen - 1] = 0;
+
+		view->line[view->lines] = strdup(line);
+		if (!view->line[view->lines])
+			goto alloc_error;
+		view->lines++;
+	}
+
+
+	if (ferror(view->pipe)) {
+		printw("Failed to read %s", view->cmd);
+		goto end;
+
+	} else if (feof(view->pipe)) {
+		printw("end of pipe");
+		goto end;
+	}
+
+	return TRUE;
+
+alloc_error:
+	printw("Allocation failure");
+
+end:
+	end_update(view);
+	return FALSE;
+}
+
+static void end_update(struct view *view)
+{
+	pclose(view->pipe);
+	view->pipe = NULL;
 }
