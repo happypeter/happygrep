@@ -247,6 +247,8 @@ static int update_view(struct view *view)
 		view->lines++;
 	}
 
+	if (redraw)
+		redraw_view(view);
 
 	if (ferror(view->pipe)) {
 		printw("Failed to read %s", view->cmd);
