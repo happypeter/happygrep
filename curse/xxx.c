@@ -149,11 +149,21 @@ static void scroll_view(/* win */ int request)
         default:
             lines = 0;
     }
-    if (lines) 
+    if (lines == 1) 
     {
         wscrl(stdscr, lines);
         getmaxyx(stdscr, y, x);
         renderer(y - lines);
+    }
+    else if (lines == -1)
+    {
+    
+        wscrl(stdscr, lines);
+        renderer(0);
+    }
+    else 
+    {
+        printw("sth wrong!!");
     }
 	redrawwin(stdscr);
 	wrefresh(stdscr);
@@ -161,6 +171,6 @@ static void scroll_view(/* win */ int request)
 static int renderer(int lineno)
 {
 
-mvprintw(lineno, 0, "renderer--------renderer");
+    mvprintw(lineno, 0, "renderer--------renderer");
 
 }
