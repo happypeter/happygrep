@@ -63,15 +63,6 @@ int main(int argc, char *argv[])
 {
 
 	init();
-	int x, y;
-    getmaxyx(stdscr, y, x);
-	status_win = newwin(1, 0, y - 2, 0);
-
-    // give some output, do the job of switch_view()
-    p_main_view->render = default_renderer;
-    p_main_view->pipe = popen(FIND_CMD, "r");
-    p_main_view->win = stdscr;
-    update_view(p_main_view);
     int c = 0;
 	while (view_driver(p_main_view, c)) 
     {
@@ -116,16 +107,25 @@ static void init(void)
     // when you <Ctr-c>, SIGINT is sent to this process, and quit() is called
 
 	initscr();      /* initialize the curses library */
-	keypad(stdscr, TRUE);  /* enable keyboard mapping */
 	nonl();         /* tell curses not to do NL->CR/NL on output */
 	cbreak();       /* take input chars one at a time, no wait for \n */
 	noecho();       /* don't echo input */
-    scrollok(stdscr, TRUE);
 
 	if (has_colors())
     {
 		init_colors();
     }
+	int x, y;
+    getmaxyx(stdscr, y, x);
+	status_win = newwin(1, 0, y - 2, 0);
+
+    // give some output, do the job of switch_view()
+    p_main_view->render = default_renderer;
+    p_main_view->pipe = popen(FIND_CMD, "r");
+    p_main_view->win = newwin( y- 2, 0, 0, 0);
+    update_view(p_main_view);
+    scrollok(p_main_view->win, TRUE);
+	keypad(p_main_view->win, TRUE);  /* enable keyboard mapping */
 }
 static void scroll_view(struct view *view, int request)
 {
@@ -179,8 +179,8 @@ static void scroll_view(struct view *view, int request)
 				break;
 		}
 	}
-	redrawwin(stdscr);
-	wrefresh(stdscr);
+	redrawwin(view->win);
+	wrefresh(view->win);
 	report_position(view, lines);
 }
 /** 
