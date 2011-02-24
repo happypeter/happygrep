@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <signal.h>
+#include <assert.h>
 
 #include <curses.h>
 
@@ -61,41 +62,22 @@ static int view_driver(struct view *view, int key);
 
 int main(int argc, char *argv[])
 {
-	int x, y;
 
 	init();
-
-	getmaxyx(stdscr, y, x); 
-    // this maybe not likes "call by value", it just a macro
-
-	attrset(COLOR_PAIR(COLOR_GREEN));
-
-	addch(ACS_VLINE);
-	printw("%s", "cg-view");
-	addch(ACS_LTEE);
-	addch(ACS_HLINE);
-	addch(ACS_HLINE);
-	addch(ACS_HLINE);
-	addch(ACS_HLINE);
-	addch(ACS_HLINE);
-	addch(ACS_HLINE);
-	addch(ACS_HLINE);
-	mvprintw(y - 1, 0, "%s", "press 'q' to quit");
-
-	attrset(A_NORMAL);
 
     // give some output, do the job of switch_view()
     p_main_view->render = default_renderer;
     p_main_view->pipe = popen("git log", "r");
     p_main_view->win = stdscr;
     update_view(p_main_view);
-    int c = getch();     /* refresh, accept single keystroke of input */
+    int c = 'j';
 	while (view_driver(p_main_view, c)) 
     {
 
 			if (p_main_view->pipe) {
 				update_view(p_main_view);
 			}
+            c = getch();     /* refresh, accept single keystroke of input */
 
     }
 
@@ -145,13 +127,12 @@ static void init(void)
 }
 static void scroll_view(struct view *view, int request)
 {
-    int lines = 1;
-    int y, x;
+	int x, y, lines = 1;
+	enum { BACKWARD = -1,  FORWARD = 1 } direction = FORWARD;
 	getmaxyx(view->win, y, x);
     switch (request) 
     {
         case 'j':
-            lines = 1;
             if (view->offset + lines > view->lines)
                 lines = view->lines - view->offset - 1;
 
@@ -161,7 +142,6 @@ static void scroll_view(struct view *view, int request)
             }
             break;
         case 'k':
-            lines = -1;
             if (lines > view->offset)
                 lines = view->offset;
 
@@ -169,29 +149,34 @@ static void scroll_view(struct view *view, int request)
                 printw("already at first line");
                 return;
             }
+		    direction = BACKWARD;
             break;
         default:
             lines = 0;
     }
-    if (lines == 1) 
-    {
-        wscrl(stdscr, lines);
-        view->render(view, y - lines);
-    }
-    else if (lines == -1)
-    {
-    
-        wscrl(stdscr, lines);
-        view->render(view, 0);
-    }
-    else 
-    {
-        printw("sth wrong!!");
-    }
+	view->offset += lines * direction;
+
+	/* Move current line into the view. */
 	if (view->lineno < view->offset)
 		view->lineno = view->offset;
 	if (view->lineno > view->offset + y)
 		view->lineno = view->offset + y;
+
+	assert(0 <= view->offset && view->offset < view->lines);
+	//assert(0 <= view->offset + lines && view->offset + lines < view->lines);
+	assert(view->offset <= view->lineno && view->lineno <= view->lines);
+
+	if (lines) {
+		int from = direction == FORWARD ? y - lines : 0;
+		int to	 = from + lines;
+
+		wscrl(view->win, lines * direction);
+
+		for (; from < to; from++) {
+			if (!view->render(view, from))
+				break;
+		}
+	}
 	view->offset += lines;
 	redrawwin(stdscr);
 	wrefresh(stdscr);
@@ -237,7 +222,6 @@ static int update_view(struct view *view)
 			goto alloc_error;
 		view->lines++;
 	}
-    printw("Update_view(): view->lines: %d", view->lines);
 
 	if (redraw)
 		redraw_view(view);
