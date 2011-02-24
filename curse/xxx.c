@@ -53,6 +53,7 @@ static int default_renderer(struct view *view, int lineno);
 static int view_driver(struct view *view, int key);
 static void report(const char *msg, ...);
 static void report_position(struct view *view, int all);
+static void navigate_view(struct view *view, int request);
 /* declaration end */
 
 /*
@@ -291,7 +292,7 @@ static int view_driver(struct view *view, int key)
 	case 'j':
 	case 'k':
 		if (view)
-			scroll_view(view, key);
+			navigate_view(view, key);
 		break;
 	case 'q':
         quit(0);
@@ -325,5 +326,66 @@ static void report_position(struct view *view, int all)
            view->lines,
            view->lines ? view->offset * 100 / view->lines : 0,
            view->offset);
+}
+
+static void navigate_view(struct view *view, int request)
+{
+	int steps;
+
+	switch (request) {
+
+	case 'k':
+		steps = -1;
+		break;
+
+	case 'j':
+		steps = 1;
+		break;
+	}
+
+	if (steps <= 0 && view->lineno == 0) {
+		report("already at first line");
+		return;
+
+	} else if (steps >= 0 && view->lineno + 1 == view->lines) {
+		report("already at last line");
+		return;
+	}
+
+	/* Move the current line */
+	view->lineno += steps;
+	assert(0 <= view->lineno && view->lineno < view->lines);
+
+	/* Repaint the old "current" line if we be scrolling */
+    view->render(view, view->lineno - steps - view->offset);
+
+	/* Check whether the view needs to be scrolled */
+    /*
+	if (view->lineno < view->offset ||
+	    view->lineno >= view->offset + view->height) {
+		if (steps < 0 && -steps > view->offset) {
+			steps = -view->offset;
+
+		} else if (steps > 0) {
+			if (view->lineno == view->lines - 1 &&
+			    view->lines > view->height) {
+				steps = view->lines - view->offset - 1;
+				if (steps >= view->height)
+					steps -= view->height - 1;
+			}
+		}
+
+        //move_view(view, steps); //we DO need this
+		return;
+	}
+    */
+
+	/* Draw the current line */
+	view->render(view, view->lineno - view->offset);
+
+	redrawwin(view->win);
+	wrefresh(view->win);
+
+	report_position(view, steps);
 }
 
