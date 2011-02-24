@@ -94,7 +94,7 @@ static void init_colors(void)
 	start_color();
 
 	init_pair(COLOR_BLACK,	 COLOR_BLACK,	COLOR_BLACK);
-	init_pair(COLOR_GREEN,	 COLOR_GREEN,	COLOR_BLACK);
+	init_pair(COLOR_GREEN,	 COLOR_WHITE,	COLOR_GREEN);
 	init_pair(COLOR_RED,	 COLOR_RED,	COLOR_BLACK);
 	init_pair(COLOR_CYAN,	 COLOR_CYAN,	COLOR_BLACK);
 	init_pair(COLOR_WHITE,	 COLOR_WHITE,	COLOR_BLACK);
@@ -120,6 +120,7 @@ static void init(void)
 	int x, y;
     getmaxyx(stdscr, y, x);
 	status_win = newwin(1, 0, y - 2, 0);
+	wattrset(status_win, COLOR_PAIR(COLOR_GREEN));
 
     // give some output, do the job of switch_view()
     p_main_view->render = default_renderer;
