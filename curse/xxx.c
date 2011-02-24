@@ -51,6 +51,9 @@ static void end_update(struct view *view);
 static void scroll_view(struct view *view, int request);
 static void redraw_view(struct view *view);
 static int default_renderer(struct view *view, int lineno);
+static int view_driver(struct view *view, int key);
+
+/* declaration end */
 
 /*
  * Main
@@ -81,47 +84,20 @@ int main(int argc, char *argv[])
 
 	attrset(A_NORMAL);
 
-    // give some output
+    // give some output, do the job of switch_view()
     p_main_view->render = default_renderer;
     p_main_view->pipe = popen("git log", "r");
     p_main_view->win = stdscr;
-    printw("popen OK");
     update_view(p_main_view);
-
-	for (;;) 
+    int c = getch();     /* refresh, accept single keystroke of input */
+	while (view_driver(p_main_view, c)) 
     {
-		int c = getch();     /* refresh, accept single keystroke of input */
 
-		/* Process the command keystroke */
-		switch (c) 
-        {
-            case 'q':
-                quit(0);
-                return 0;
+			if (p_main_view->pipe) {
+				update_view(p_main_view);
+			}
 
-            case 's':
-                addstr("Shelling out...");
-                def_prog_mode();           /* save current tty modes */
-                endwin();                  /* restore original tty modes */
-                system("sh");              /* run shell */
-                addstr("returned.\n");     /* prepare return message */
-                reset_prog_mode();
-                //refresh();                 /* restore save modes, repaint screen */
-                break;
-            case 'j':
-            case 'k':
-                scroll_view(p_main_view,c);           
-                break;
-
-            default:
-                if (isprint(c) || isspace(c))
-                {
-                    addch(c);
-                }
-                break;
-		}
-
-	}
+    }
 
 	quit(0);
 }
@@ -250,8 +226,8 @@ static int update_view(struct view *view)
 	while ((line = fgets(buffer, sizeof(buffer), view->pipe))) 
     {
 		int linelen;
-		if (!lines--)
-			break;
+        if (!lines--)
+            break;
 
 		linelen = strlen(line);
 		if (linelen)
@@ -317,6 +293,23 @@ static int default_renderer(struct view *view, int lineno)
 	if (!line) return FALSE;
 
 	mvwprintw(view->win, lineno, 0, "%4d: %s", view->offset + lineno, line);
+
+	return TRUE;
+}
+/* Process a keystroke */
+static int view_driver(struct view *view, int key)
+{
+	switch (key) 
+    {
+	case 'j':
+	case 'k':
+		if (view)
+			scroll_view(view, key);
+		break;
+
+	default:
+		return TRUE;
+	}
 
 	return TRUE;
 }
