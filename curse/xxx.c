@@ -178,6 +178,7 @@ static void scroll_view(struct view *view, int request)
             lines = 1;
             if (view->offset + lines > view->lines)
                 lines = view->lines - view->offset - 1;
+            printw("view->lines: %d", view->lines);
 
             if (lines == 0 || view->offset + y >= view->lines) {
                 printw("already at last line");
@@ -227,20 +228,16 @@ static void scroll_view(struct view *view, int request)
 */
 static int update_view(struct view *view)
 {
-    printf("hello printf\n");
-    printw("hello printw\n");
 	char buffer[BUFSIZ];
 	char *line;
 	int lines, cols;
 	char **tmp;
 	int redraw;
-    printf("hello printf\n");
-    printw("hello printw\n");
 
 	if (!view->pipe)
 		return TRUE;
 
-	getmaxyx(stdscr, lines, cols);
+	getmaxyx(view->win, lines, cols);
 
 	redraw = !view->line;
 
@@ -250,9 +247,9 @@ static int update_view(struct view *view)
 
 	view->line = tmp;
 
-	while ((line = fgets(buffer, sizeof(buffer), view->pipe))) {
+	while ((line = fgets(buffer, sizeof(buffer), view->pipe))) 
+    {
 		int linelen;
-
 		if (!lines--)
 			break;
 
@@ -265,6 +262,7 @@ static int update_view(struct view *view)
 			goto alloc_error;
 		view->lines++;
 	}
+    printw("Update_view(): view->lines: %d", view->lines);
 
 	if (redraw)
 		redraw_view(view);
