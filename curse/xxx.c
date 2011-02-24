@@ -177,7 +177,6 @@ static void scroll_view(struct view *view, int request)
 				break;
 		}
 	}
-	view->offset += lines;
 	redrawwin(stdscr);
 	wrefresh(stdscr);
 }
