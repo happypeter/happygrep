@@ -63,6 +63,8 @@ int main(int argc, char *argv[])
 {
 
 	init();
+    update_view(p_main_view);
+    update_view(p_main_view);
     int c = 0;
 	while (view_driver(p_main_view, c)) 
     {
@@ -70,7 +72,7 @@ int main(int argc, char *argv[])
 			if (p_main_view->pipe) {
 				update_view(p_main_view);
 			}
-            c = getch();     /* refresh, accept single keystroke of input */
+            c = wgetch(status_win);     /* refresh, accept single keystroke of input */
 
     }
 
@@ -123,7 +125,6 @@ static void init(void)
     p_main_view->render = default_renderer;
     p_main_view->pipe = popen(FIND_CMD, "r");
     p_main_view->win = newwin( y- 2, 0, 0, 0);
-    update_view(p_main_view);
     scrollok(p_main_view->win, TRUE);
 	keypad(p_main_view->win, TRUE);  /* enable keyboard mapping */
 }
