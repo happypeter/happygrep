@@ -52,6 +52,7 @@ static void redraw_view(struct view *view);
 static int default_renderer(struct view *view, int lineno);
 static int view_driver(struct view *view, int key);
 static void report(const char *msg, ...);
+static void report_position(struct view *view, int all);
 /* declaration end */
 
 /*
@@ -180,6 +181,7 @@ static void scroll_view(struct view *view, int request)
 	}
 	redrawwin(stdscr);
 	wrefresh(stdscr);
+	report_position(view, lines);
 }
 /** 
 * @brief clean up work, after things 
@@ -231,7 +233,7 @@ static int update_view(struct view *view)
 		goto end;
 
 	} else if (feof(view->pipe)) {
-		printw("end of pipe");
+	    report_position(view, lines);
 		goto end;
 	}
 
@@ -312,5 +314,14 @@ static void report(const char *msg, ...)
 	wrefresh(status_win);
 
 	va_end(args);
+}
+static void report_position(struct view *view, int all)
+{
+    report(all ? "line %d of %d (%d%%) viewing from %d"
+             : "line %d of %d",
+           view->lineno + 1,
+           view->lines,
+           view->lines ? view->offset * 100 / view->lines : 0,
+           view->offset);
 }
 
