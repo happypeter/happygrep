@@ -100,7 +100,7 @@ static void init_colors(void)
 	init_pair(COLOR_CYAN,	 COLOR_CYAN,	COLOR_BLACK);
 	init_pair(COLOR_WHITE,	 COLOR_WHITE,	COLOR_BLACK);
 	init_pair(COLOR_MAGENTA, COLOR_MAGENTA,	COLOR_BLACK);
-	init_pair(COLOR_BLUE,	 COLOR_BLUE,	COLOR_BLACK);
+	init_pair(COLOR_BLUE,	 COLOR_WHITE,	COLOR_BLUE);
 	init_pair(COLOR_YELLOW,	 COLOR_YELLOW,	COLOR_BLACK);
 }
 
@@ -121,7 +121,7 @@ static void init(void)
 	int x, y;
     getmaxyx(stdscr, y, x);
 	status_win = newwin(1, 0, y - 2, 0);
-	wattrset(status_win, COLOR_PAIR(COLOR_GREEN));
+	wattrset(status_win, COLOR_PAIR(COLOR_BLUE));
 
     // give some output, do the job of switch_view()
     p_main_view->render = default_renderer;
@@ -280,7 +280,21 @@ static int default_renderer(struct view *view, int lineno)
 	line = view->line[view->offset + lineno];
 	if (!line) return FALSE;
 
-	mvwprintw(view->win, lineno, 0, "%4d--%d---offset:%d: %s", view->offset + lineno, view->lines,view->offset, line);
+
+    // hilight the current line
+    
+	if (view->offset + lineno == view->lineno) 
+    {
+	    wattrset(view->win, COLOR_PAIR(COLOR_GREEN));
+	    mvwprintw(view->win, lineno, 0, "%4d--%d---offset:%d: %s", view->offset + lineno, view->lines,view->offset, line);
+		//LINE_CURSOR, higlight;
+	} 
+     else 
+     {
+	    wattrset(view->win, COLOR_PAIR(COLOR_WHITE));
+	    mvwprintw(view->win, lineno, 0, "%4d--%d---offset:%d: %s", view->offset + lineno, view->lines,view->offset, line);
+         
+     }
 
 	return TRUE;
 }
