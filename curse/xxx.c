@@ -18,10 +18,7 @@ static void init(void);
  * commands
  */
 
-#define DIFF_CMD	\
-	"git log --stat -n1 %s ; echo; " \
-	"git diff --find-copies-harder -B -C %s^ %s"
-
+#define FIND_CMD "find ."	
 #define LOG_CMD	\
 	"git log --stat -n100 %s"
 /*
@@ -67,11 +64,11 @@ int main(int argc, char *argv[])
 	init();
 	int x, y;
     getmaxyx(stdscr, y, x);
-	status_win = newwin(1, 0, y - 1, 0);
+	status_win = newwin(1, 0, y - 2, 0);
 
     // give some output, do the job of switch_view()
     p_main_view->render = default_renderer;
-    p_main_view->pipe = popen("git log", "r");
+    p_main_view->pipe = popen(FIND_CMD, "r");
     p_main_view->win = stdscr;
     update_view(p_main_view);
     int c = 0;
@@ -292,6 +289,9 @@ static int view_driver(struct view *view, int key)
 		if (view)
 			scroll_view(view, key);
 		break;
+	case 'q':
+        quit(0);
+        break;
 
 	default:
 		return TRUE;
