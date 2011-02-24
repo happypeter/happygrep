@@ -10,6 +10,7 @@
  * Init and quit
  */
 
+static WINDOW *status_win;
 static void init_colors(void);
 static void quit(int sig);
 static void init(void);
@@ -53,7 +54,7 @@ static void scroll_view(struct view *view, int request);
 static void redraw_view(struct view *view);
 static int default_renderer(struct view *view, int lineno);
 static int view_driver(struct view *view, int key);
-
+static void report(const char *msg, ...);
 /* declaration end */
 
 /*
@@ -64,6 +65,9 @@ int main(int argc, char *argv[])
 {
 
 	init();
+	int x, y;
+    getmaxyx(stdscr, y, x);
+	status_win = newwin(1, 0, y - 1, 0);
 
     // give some output, do the job of switch_view()
     p_main_view->render = default_renderer;
@@ -86,9 +90,9 @@ int main(int argc, char *argv[])
 
 static void quit(int sig)
 {
+	if (status_win)
+		delwin(status_win);
 	endwin();
-    printf("printf quit\n");
-
 	/* do your non-curses wrapup here */
 
 	exit(0);
@@ -137,7 +141,7 @@ static void scroll_view(struct view *view, int request)
                 lines = view->lines - view->offset - 1;
 
             if (lines == 0 || view->offset + y >= view->lines) {
-                printw("already at last line");
+                report("already at last line");
                 return;
             }
             break;
@@ -146,7 +150,7 @@ static void scroll_view(struct view *view, int request)
                 lines = view->offset;
 
             if (lines == 0) {
-                printw("already at first line");
+                report("already at first line");
                 return;
             }
 		    direction = BACKWARD;
@@ -295,3 +299,18 @@ static int view_driver(struct view *view, int key)
 
 	return TRUE;
 }
+static void report(const char *msg, ...)
+{
+	va_list args;
+
+	va_start(args, msg);
+
+	werase(status_win);
+	wmove(status_win, 0, 0);
+
+	vwprintw(status_win, msg, args);
+	wrefresh(status_win);
+
+	va_end(args);
+}
+
