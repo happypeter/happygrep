@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
     p_main_view->pipe = popen("git log", "r");
     p_main_view->win = stdscr;
     update_view(p_main_view);
-    int c = 'j';
+    int c = 0;
 	while (view_driver(p_main_view, c)) 
     {
 
