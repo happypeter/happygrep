@@ -154,7 +154,6 @@ static void scroll_view(struct view *view, int request)
             lines = 1;
             if (view->offset + lines > view->lines)
                 lines = view->lines - view->offset - 1;
-            printw("view->lines: %d", view->lines);
 
             if (lines == 0 || view->offset + y >= view->lines) {
                 printw("already at last line");
@@ -292,7 +291,7 @@ static int default_renderer(struct view *view, int lineno)
 	line = view->line[view->offset + lineno];
 	if (!line) return FALSE;
 
-	mvwprintw(view->win, lineno, 0, "%4d: %s", view->offset + lineno, line);
+	mvwprintw(view->win, lineno, 0, "%4d--%d---offset:%d: %s", view->offset + lineno, view->lines,view->offset, line);
 
 	return TRUE;
 }
