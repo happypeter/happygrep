@@ -31,6 +31,7 @@ struct view {
 	/* Rendering */
 	int (*render)(struct view *, int);
 	WINDOW *win;
+	int height, width;
 
 	/* Navigation */
 	unsigned long offset;	/* Offset of the window top */
@@ -64,8 +65,6 @@ int main(int argc, char *argv[])
 {
 
 	init();
-    update_view(p_main_view);
-    update_view(p_main_view);
     int c = 0;
 	while (view_driver(p_main_view, c)) 
     {
@@ -129,6 +128,7 @@ static void init(void)
     p_main_view->win = newwin( y- 2, 0, 0, 0);
     scrollok(p_main_view->win, TRUE);
 	keypad(p_main_view->win, TRUE);  /* enable keyboard mapping */
+    update_view(p_main_view);
 }
 static void scroll_view(struct view *view, int request)
 {
