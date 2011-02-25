@@ -315,7 +315,15 @@ static int view_driver(struct view *view, int key)
 	case 'q':
         quit(0);
         break;
-
+    case 's':
+        addstr("Shelling out...");
+        def_prog_mode();           /* save current tty modes */
+        endwin();                  /* restore original tty modes */
+        system("vim");              /* run shell */
+        addstr("returned.\n");     /* prepare return message */
+        reset_prog_mode();
+        refresh();                 /* restore save modes, repaint screen */
+        break;
 	default:
 		return TRUE;
 	}
