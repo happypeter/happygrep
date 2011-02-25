@@ -131,9 +131,6 @@ static int update_view(struct view *view)
 	char **tmp;
 	int redraw;
 
-	if (!view->pipe)
-		return TRUE;
-
 	getmaxyx(view->win, lines, cols);
 
 	redraw = !view->line;
@@ -239,7 +236,7 @@ static int view_driver(struct view *view, int key)
 	case 'q':
         quit(0);
         break;
-    case 's':
+    case 'e':
         addstr("Shelling out...");
         def_prog_mode();           /* save current tty modes */
         endwin();                  /* restore original tty modes */
