@@ -55,6 +55,7 @@ static int view_driver(struct view *view, int key);
 static void report(const char *msg, ...);
 static void report_position(struct view *view, int all);
 static void navigate_view(struct view *view, int request);
+static void move_view(struct view *view, int lines);
 /* declaration end */
 
 /*
@@ -377,7 +378,7 @@ static void navigate_view(struct view *view, int request)
     view->render(view, view->lineno - steps - view->offset);
 
 	/* Check whether the view needs to be scrolled */
-    /*
+    
 	if (view->lineno < view->offset ||
 	    view->lineno >= view->offset + view->height) {
 		if (steps < 0 && -steps > view->offset) {
@@ -392,10 +393,10 @@ static void navigate_view(struct view *view, int request)
 			}
 		}
 
-        //move_view(view, steps); //we DO need this
+        move_view(view, steps); //we DO need this
 		return;
 	}
-    */
+   
 
 	/* Draw the current line */
 	view->render(view, view->lineno - view->offset);
@@ -404,5 +405,44 @@ static void navigate_view(struct view *view, int request)
 	wrefresh(view->win);
 
 	report_position(view, steps);
+}
+
+static void move_view(struct view *view, int lines)
+{
+	/* The rendering expects the new offset. */
+	view->offset += lines;
+
+	assert(0 <= view->offset && view->offset < view->lines);
+	assert(lines);
+
+		int line = lines > 0 ? view->height - lines : 0;
+		int end = line + (lines > 0 ? lines : -lines);
+
+		wscrl(view->win, lines);
+
+		for (; line < end; line++) 
+        {
+			if (!view->render(view, line))
+				break;
+        }
+	/* Move current line into the view. */
+	if (view->lineno < view->offset) 
+    {
+		view->lineno = view->offset;
+		view->render(view, 0);
+
+	} 
+    else if (view->lineno >= view->offset + view->height) 
+    {
+		view->lineno = view->offset + view->height - 1;
+		view->render(view, view->lineno - view->offset);
+	}
+
+	assert(view->offset <= view->lineno && view->lineno < view->lines);
+
+	redrawwin(view->win);
+	wrefresh(view->win);
+
+	report_position(view, lines);
 }
 
