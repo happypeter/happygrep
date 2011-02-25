@@ -117,7 +117,7 @@ static void init(void)
     {
 		init_colors();
     }
-	int x, y;
+	int x, y; //x, y, the size of whole terminal
     getmaxyx(stdscr, y, x);
 	status_win = newwin(1, 0, y - 2, 0);
 	wattrset(status_win, COLOR_PAIR(COLOR_BLUE));
@@ -126,6 +126,9 @@ static void init(void)
     p_main_view->render = default_renderer;
     p_main_view->pipe = popen(FIND_CMD, "r");
     p_main_view->win = newwin( y- 2, 0, 0, 0);
+    getmaxyx(p_main_view->win, p_main_view->height,p_main_view->width); 
+    // now p_main_view->height == y - 2, and its the size of main_view, not
+    // the whole terminal
     scrollok(p_main_view->win, TRUE);
 	keypad(p_main_view->win, TRUE);  /* enable keyboard mapping */
     update_view(p_main_view);
