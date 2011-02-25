@@ -151,7 +151,7 @@ static int update_view(struct view *view)
 		if (linelen)
 			line[linelen - 1] = 0;
 
-		view->line[view->lines] = strdup(line);
+		view->line[view->lines] = strdup(line); //store the adress of "line" NOT the content
 		if (!view->line[view->lines])
 			goto alloc_error;
 		view->lines++;
