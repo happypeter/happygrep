@@ -48,7 +48,6 @@ static struct view main_view;
 struct view *p_main_view = &main_view; // we only need one view for now 
 static int  update_view(struct view *view);
 static void end_update(struct view *view);
-static void scroll_view(struct view *view, int request);
 static void redraw_view(struct view *view);
 static int default_renderer(struct view *view, int lineno);
 static int view_driver(struct view *view, int key);
@@ -133,62 +132,6 @@ static void init(void)
     scrollok(p_main_view->win, TRUE);
 	keypad(p_main_view->win, TRUE);  /* enable keyboard mapping */
     update_view(p_main_view);
-}
-static void scroll_view(struct view *view, int request)
-{
-	int x, y, lines = 1;
-	enum { BACKWARD = -1,  FORWARD = 1 } direction = FORWARD;
-	getmaxyx(view->win, y, x);
-    switch (request) 
-    {
-        case 'j':
-            if (view->offset + lines > view->lines)
-                lines = view->lines - view->offset - 1;
-
-            if (lines == 0 || view->offset + y >= view->lines) {
-                report("already at last line");
-                return;
-            }
-            break;
-        case 'k':
-            if (lines > view->offset)
-                lines = view->offset;
-
-            if (lines == 0) {
-                report("already at first line");
-                return;
-            }
-		    direction = BACKWARD;
-            break;
-        default:
-            lines = 0;
-    }
-	view->offset += lines * direction;
-
-	/* Move current line into the view. */
-	if (view->lineno < view->offset)
-		view->lineno = view->offset;
-	if (view->lineno > view->offset + y)
-		view->lineno = view->offset + y;
-
-	assert(0 <= view->offset && view->offset < view->lines);
-	//assert(0 <= view->offset + lines && view->offset + lines < view->lines);
-	assert(view->offset <= view->lineno && view->lineno <= view->lines);
-
-	if (lines) {
-		int from = direction == FORWARD ? y - lines : 0;
-		int to	 = from + lines;
-
-		wscrl(view->win, lines * direction);
-
-		for (; from < to; from++) {
-			if (!view->render(view, from))
-				break;
-		}
-	}
-	redrawwin(view->win);
-	wrefresh(view->win);
-	report_position(view, lines);
 }
 /** 
 * @brief clean up work, after things 
