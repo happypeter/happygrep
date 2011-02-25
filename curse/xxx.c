@@ -1,29 +1,17 @@
+#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <signal.h>
 #include <assert.h>
-
 #include <curses.h>
-
-/*
- * Init and quit
- */
 
 static WINDOW *status_win;
 static void init_colors(void);
 static void quit(int sig);
 static void init(void);
-/* 
- * commands
- */
-
 #define FIND_CMD "find ."	
-#define LOG_CMD	\
-	"git log --stat -n100 %s"
-/*
- * view
- */
+
 struct view {
 	char *name;
 	char *cmd;
@@ -57,9 +45,6 @@ static void navigate_view(struct view *view, int request);
 static void move_view(struct view *view, int lines);
 /* declaration end */
 
-/*
- * Main
- */
 
 int main(int argc, char *argv[])
 {
@@ -72,7 +57,7 @@ int main(int argc, char *argv[])
 			if (p_main_view->pipe) {
 				update_view(p_main_view);
 			}
-            c = wgetch(status_win);     /* refresh, accept single keystroke of input */
+            c = wgetch(status_win);     
 
     }
 
@@ -92,7 +77,6 @@ static void quit(int sig)
 static void init_colors(void)
 {
 	start_color();
-
 	init_pair(COLOR_BLACK,	 COLOR_BLACK,	COLOR_BLACK);
 	init_pair(COLOR_GREEN,	 COLOR_WHITE,	COLOR_GREEN);
 	init_pair(COLOR_RED,	 COLOR_RED,	COLOR_BLACK);
@@ -106,8 +90,6 @@ static void init_colors(void)
 static void init(void)
 {
     signal(SIGINT, quit);      /* arrange interrupts to terminate */
-    // when you <Ctr-c>, SIGINT is sent to this process, and quit() is called
-
 	initscr();      /* initialize the curses library */
 	nonl();         /* tell curses not to do NL->CR/NL on output */
 	cbreak();       /* take input chars one at a time, no wait for \n */
@@ -122,7 +104,7 @@ static void init(void)
 	status_win = newwin(1, 0, y - 2, 0);
 	wattrset(status_win, COLOR_PAIR(COLOR_BLUE));
 
-    // give some output, do the job of switch_view()
+    // give some output, do the job of switch_view() in tig.c
     p_main_view->render = default_renderer;
     p_main_view->pipe = popen(FIND_CMD, "r");
     p_main_view->win = newwin( y- 2, 0, 0, 0);
@@ -227,17 +209,13 @@ static int default_renderer(struct view *view, int lineno)
 	line = view->line[view->offset + lineno];
 	if (!line) return FALSE;
 
-
-    // hilight the current line
-    
 	if (view->offset + lineno == view->lineno) 
-    {
+    { // hilight the current line
 	    wattrset(view->win, COLOR_PAIR(COLOR_GREEN));
 	    mvwprintw(view->win, lineno, 0, "%4d--%d---offset:%d: %s", view->offset + lineno, view->lines,view->offset, line);
-		//LINE_CURSOR, higlight;
 	} 
      else 
-     {
+     { // normal color for mormal lines
 	    wattrset(view->win, COLOR_PAIR(COLOR_WHITE));
 	    mvwprintw(view->win, lineno, 0, "%4d--%d---offset:%d: %s", view->offset + lineno, view->lines,view->offset, line);
          
@@ -245,7 +223,7 @@ static int default_renderer(struct view *view, int lineno)
 
 	return TRUE;
 }
-/* Process a keystroke */
+
 static int view_driver(struct view *view, int key)
 {
 	switch (key) 
@@ -287,6 +265,7 @@ static void report(const char *msg, ...)
 
 	va_end(args);
 }
+
 static void report_position(struct view *view, int all)
 {
     report(all ? "line %d of %d (%d%%) viewing from %d"
@@ -329,22 +308,26 @@ static void navigate_view(struct view *view, int request)
     view->render(view, view->lineno - steps - view->offset);
 
 	/* Check whether the view needs to be scrolled */
-    
 	if (view->lineno < view->offset ||
-	    view->lineno >= view->offset + view->height) {
-		if (steps < 0 && -steps > view->offset) {
+	    view->lineno >= view->offset + view->height) 
+    {
+		if (steps < 0 && -steps > view->offset) 
+        {
 			steps = -view->offset;
-
-		} else if (steps > 0) {
+		} 
+        else if (steps > 0) 
+        {
 			if (view->lineno == view->lines - 1 &&
-			    view->lines > view->height) {
+			    view->lines > view->height) 
+            {
 				steps = view->lines - view->offset - 1;
 				if (steps >= view->height)
+                {
 					steps -= view->height - 1;
+                }
 			}
 		}
-
-        move_view(view, steps); //we DO need this
+        move_view(view, steps); 
 		return;
 	}
    
@@ -354,7 +337,6 @@ static void navigate_view(struct view *view, int request)
 
 	redrawwin(view->win);
 	wrefresh(view->win);
-
 	report_position(view, steps);
 }
 
@@ -366,16 +348,17 @@ static void move_view(struct view *view, int lines)
 	assert(0 <= view->offset && view->offset < view->lines);
 	assert(lines);
 
-		int line = lines > 0 ? view->height - lines : 0;
-		int end = line + (lines > 0 ? lines : -lines);
+    int line = lines > 0 ? view->height - lines : 0;
+    int end = line + (lines > 0 ? lines : -lines);
 
-		wscrl(view->win, lines);
+    wscrl(view->win, lines);
 
-		for (; line < end; line++) 
-        {
-			if (!view->render(view, line))
-				break;
-        }
+    for (; line < end; line++) 
+    {
+        if (!view->render(view, line))
+            break;
+    }
+
 	/* Move current line into the view. */
 	if (view->lineno < view->offset) 
     {
