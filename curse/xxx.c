@@ -10,7 +10,10 @@ static WINDOW *status_win;
 static void init_colors(void);
 static void quit(int sig);
 static void init(void);
-#define FIND_CMD "find ."	
+
+// annoying is the "\\" escape sign, why double? C string needs one for "\" and
+// bash needs another for "(", "!" and ")"
+#define FIND_CMD "find . -type d -name .git -prune -o \\( \\! -name *.swp \\) -exec grep -in ii {} +"
 
 struct view {
 	char *name;
