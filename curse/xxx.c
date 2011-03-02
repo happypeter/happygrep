@@ -18,18 +18,35 @@ static void init(void);
 
 // annoying is the "\\" escape sign, why double? C string needs one for "\" and
 // bash needs another for "(", "!" and ")"
-#define FIND_CMD "find . -type d -name .git -prune -o \\( \\! -name *.swp \\) -exec grep -in main {} +"
+#define FIND_CMD \
+"find . -type d -name .git -prune -o \\( \\! -name *.swp \\) -exec grep -in void {} +"
 
 #define COLOR_DEFAULT  (-1)
 #define ABS(x) ((x) >=0 ? (x) : -(x))
 #define MIN(x) ((x) <= (y) ? (x) : (y))
 #define ARRAY_SIZE(x)   (sizeof(x) / sizeof(x[0]))
 
+/*
+ * String helpers
+ */
+static inline void
+string_ncopy(char *dst, const char *src, int dstlen)
+{
+	strncpy(dst, src, dstlen - 1);
+	dst[dstlen - 1] = 0;
+
+}
+
+/* Shorthand for safely copying into a fixed buffer. */
+#define string_copy(dst, src) \
+	string_ncopy(dst, src, sizeof(dst))
+
 struct view {
 	char *name;
 	char *cmd;
 
 	/* Rendering */
+    bool (*read)(struct view *view, char *line);
     bool (*render)(struct view *view, unsigned int lineno);
 	WINDOW *win;
 	WINDOW *title;
@@ -52,6 +69,7 @@ static int  update_view(struct view *view);
 static bool begin_update(struct view *view);
 static void end_update(struct view *view);
 static void redraw_view_from(struct view *view, int lineno);
+static bool default_read(struct view *view, char *line);
 static bool default_render(struct view *view, unsigned int lineno);
 static void report_position(struct view *view, int all);
 static void navigate_view(struct view *view, int request);
@@ -62,7 +80,11 @@ static void open_view(struct view *prev);
 
 
 static struct view main_view = {
-   "main", FIND_CMD, default_render};
+    "main", 
+    FIND_CMD, 
+    default_read, 
+    default_render,
+};
 
 /* The display array of active views and the index of the current view. */
 static struct view *display[2];
@@ -347,15 +369,13 @@ static int update_view(struct view *view)
 	while ((line = fgets(buffer, sizeof(buffer), view->pipe))) 
     {
 		int linelen;
-
 		linelen = strlen(line);
+
 		if (linelen)
 			line[linelen - 1] = 0;
 
-		view->line[view->lines] = strdup(line); //store the adress of "line" NOT the content
-		if (!view->line[view->lines])
+		if (!view->read(view, line))
 			goto alloc_error;
-		view->lines++;
 
 		if (lines-- == 1)
 			break;
@@ -411,29 +431,112 @@ static void redraw_view_from(struct view *view, int lineno)
 	wrefresh(view->win);
 }
 
+struct fileinfo {
+	char name[65];		
+	char content[85];
+    char number[5];
+};
+
+static char word[BUFSIZ];
+
+char *strsplit(const char *line, const char c)
+{
+    int i = 0;
+    while (*line != c) {
+        word[i++] = *line;
+        line++;
+    }
+    word[i] = '\0'; 
+    return word;
+}
+
+static bool default_read(struct view *view, char *line)
+{
+	struct fileinfo *fileinfo;
+    char *top = "Binary file";
+    char *end;
+
+    fileinfo= calloc(1, sizeof(struct fileinfo));
+    if (!fileinfo)
+        return false;
+
+    if(!strncmp(line, top, strlen(top))) 
+            return true;
+
+    line += 2;
+    view->line[view->lines++] = fileinfo;
+    string_copy(fileinfo->name, strsplit(line, ':'));
+
+	end = strchr(line, ':');
+    end += 1;
+    string_copy(fileinfo->number, strsplit(end, ':'));
+
+    end = strchr(end, ':');
+    end += 1;
+    while (*end == ' ') 
+        end++;
+    string_copy(fileinfo->content, end);
+
+    return true;
+}
+  
 static bool default_render(struct view *view, unsigned int lineno)
 {
-	char *line;
-	int i;
-    enum line_type type;
+	struct fileinfo *fileinfo;
+	enum line_type type;
+	int col = 0;
+	size_t numberlen;
+	size_t namelen;
 
-	line = view->line[view->offset + lineno];
-	if (!line) return FALSE;
+	if (view->offset + lineno >= view->lines)
+		return false;
 
-	if (view->offset + lineno == view->lineno) 
-    { // hilight the current line
-        type = LINE_CURSOR;
-	    wattrset(view->win, get_line_attr(type));
-        wchgat(view->win, -1, 0, type, NULL);
-	} 
-    else 
-    { // normal color for mormal lines
-        type = LINE_FILE_LINCON;
-	    wattrset(view->win, get_line_attr(type));
-    }
-    mvwprintw(view->win, lineno, 0, line);
+	fileinfo = view->line[view->offset + lineno];
+	if (!*fileinfo->name)
+		return false;
 
-	return TRUE;
+	wmove(view->win, lineno, col);
+
+	if (view->offset + lineno == view->lineno) {
+		type = LINE_CURSOR;
+		wattrset(view->win, get_line_attr(type));
+	//	wchgat(view->win, -1, 0, type, NULL);
+
+	} else {
+		type = LINE_FILE_LINCON;
+		wattrset(view->win, get_line_attr(LINE_FILE_NAME));
+	}
+
+	waddstr(view->win, fileinfo->name);
+    namelen = strlen(fileinfo->name);
+
+    col += 5;
+	wmove(view->win, lineno, col);
+	if (type != LINE_CURSOR)
+		wattrset(view->win, get_line_attr(LINE_FILE_LINUM));
+
+	waddstr(view->win, fileinfo->number);
+    numberlen = strlen(fileinfo->number);
+
+    col += 7;
+	if (type != LINE_CURSOR)
+		wattrset(view->win, A_NORMAL);
+
+	mvwaddch(view->win, lineno, col, ACS_LTEE);
+	wmove(view->win, lineno, col + 2);
+	col += 2;
+
+	if (type != LINE_CURSOR)
+		wattrset(view->win, get_line_attr(type));
+
+    int contentlen = strlen(fileinfo->content);
+
+    if (col + contentlen > view->width-5*col)
+        contentlen = view->width - 2*col;
+
+    waddnstr(view->win, fileinfo->content, contentlen);
+
+	return true;
 }
 
 static void open_view(struct view *prev)
@@ -495,6 +598,7 @@ static int view_driver(struct view *view, int key)
 
 	return TRUE;
 }
+
 static void report(const char *msg, ...)
 {
     static bool empty = true;
@@ -579,7 +683,6 @@ static void navigate_view(struct view *view, int request)
 		return;
 	}
    
-
 	/* Draw the current line */
 	view->render(view, view->lineno - view->offset);
 
