@@ -51,7 +51,7 @@ static int view_driver(struct view *view, int key);
 static int  update_view(struct view *view);
 static bool begin_update(struct view *view);
 static void end_update(struct view *view);
-static void redraw_view(struct view *view);
+static void redraw_view_from(struct view *view, int lineno);
 static bool default_render(struct view *view, unsigned int lineno);
 static void report_position(struct view *view, int all);
 static void navigate_view(struct view *view, int request);
@@ -327,13 +327,16 @@ static int update_view(struct view *view)
 {
 	char buffer[BUFSIZ];
 	char *line;
-	int lines, cols;
 	char **tmp;
-	int redraw;
+	int redraw_from = -1;
+	unsigned long lines = view->height;
 
-	getmaxyx(view->win, lines, cols);
+	if (!view->pipe)
+		return TRUE;
 
-	redraw = !view->line;
+	/* Only redraw if lines are visible. */
+	if (view->offset + view->height >= view->lines)
+		redraw_from = view->lines - view->offset;
 
 	tmp = realloc(view->line, sizeof(*view->line) * (view->lines + lines));
 	if (!tmp)
@@ -344,8 +347,6 @@ static int update_view(struct view *view)
 	while ((line = fgets(buffer, sizeof(buffer), view->pipe))) 
     {
 		int linelen;
-        if (!lines--)
-            break;
 
 		linelen = strlen(line);
 		if (linelen)
@@ -355,10 +356,21 @@ static int update_view(struct view *view)
 		if (!view->line[view->lines])
 			goto alloc_error;
 		view->lines++;
+
+		if (lines-- == 1)
+			break;
 	}
 
-	if (redraw)
-		redraw_view(view);
+	if (redraw_from >= 0) {
+		/* If this is an incremental update, redraw the previous line
+		 * since for commits some members could have changed when
+		 * loading the main view. */
+		if (redraw_from > 0)
+			redraw_from--;
+
+		/* Incrementally draw avoids flickering. */
+		redraw_view_from(view, redraw_from);
+	}
 
 	update_title_win(view);
 
@@ -387,17 +399,11 @@ static void end_update(struct view *view)
 	view->pipe = NULL;
 }
 
-static void redraw_view(struct view *view)
+static void redraw_view_from(struct view *view, int lineno)
 {
-	int lineno;
-	int lines, cols;
+	assert(0 <= lineno && lineno < view->height);
 
-	wclear(view->win);
-	wmove(view->win, 0, 0);
-
-	getmaxyx(view->win, lines, cols);
-
-	for (lineno = 0; lineno < lines; lineno++) {
+	for (; lineno < view->height; lineno++) {
 		view->render(view, lineno);
 	}
 
