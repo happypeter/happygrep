@@ -25,6 +25,7 @@ static void init(void);
 #define ABS(x) ((x) >=0 ? (x) : -(x))
 #define MIN(x) ((x) <= (y) ? (x) : (y))
 #define ARRAY_SIZE(x)   (sizeof(x) / sizeof(x[0]))
+#define VIM_CMD  "vim +%s %s"
 
 /*
  * String helpers
@@ -95,6 +96,7 @@ static unsigned int current_view;
 static bool cursed = false;
 static WINDOW *status_win; 
 static char fmt_cmd[BUFSIZ];
+static char vim_cmd[BUFSIZ];
 /*
  * Line-oriented content detection.
  */
@@ -495,6 +497,7 @@ static bool default_render(struct view *view, unsigned int lineno)
 	int col = 0;
 	size_t numberlen;
 	size_t namelen;
+    char *fname, *fnumber;
 
 	if (view->offset + lineno >= view->lines)
 		return false;
@@ -506,6 +509,9 @@ static bool default_render(struct view *view, unsigned int lineno)
 	wmove(view->win, lineno, col);
 
 	if (view->offset + lineno == view->lineno) {
+        fnumber = fileinfo->number;
+        fname = fileinfo->name;
+        snprintf(vim_cmd, sizeof(vim_cmd), VIM_CMD, fnumber, fname);
 		type = LINE_CURSOR;
 		wattrset(view->win, get_line_attr(type));
 	//	wchgat(view->win, -1, 0, type, NULL);
@@ -592,7 +598,7 @@ static int view_driver(struct view *view, int key)
         addstr("Shelling out...");
         def_prog_mode();           /* save current tty modes */
         endwin();                  /* restore original tty modes */
-        system("vim");              /* run shell */
+        system(vim_cmd);              /* run shell */
         addstr("returned.\n");     /* prepare return message */
         reset_prog_mode();
         refresh();                 /* restore save modes, repaint screen */
