@@ -19,7 +19,7 @@ static void init(void);
 // annoying is the "\\" escape sign, why double? C string needs one for "\" and
 // bash needs another for "(", "!" and ")"
 #define FIND_CMD \
-"find . -type d -name .git -prune -o \\( \\! -name *.swp \\) -exec grep -in void {} +"
+"find . -type d -name .git -prune -o \\( \\! -name *.swp \\) -exec grep -in %s {} +"
 
 #define COLOR_DEFAULT  (-1)
 #define ABS(x) ((x) >=0 ? (x) : -(x))
@@ -43,7 +43,6 @@ string_ncopy(char *dst, const char *src, int dstlen)
 
 struct view {
 	char *name;
-	char *cmd;
 
 	/* Rendering */
     bool (*read)(struct view *view, char *line);
@@ -59,6 +58,7 @@ struct view {
 	/* Buffering */
 	unsigned long lines;	/* Total number of lines */
 	char **line;		/* Line index */
+    char *cmd;
 
 	/* Loading */
 	FILE *pipe;
@@ -81,7 +81,6 @@ static void open_view(struct view *prev);
 
 static struct view main_view = {
     "main", 
-    FIND_CMD, 
     default_read, 
     default_render,
 };
@@ -95,7 +94,7 @@ static unsigned int current_view;
 
 static bool cursed = false;
 static WINDOW *status_win; 
-
+static char fmt_cmd[BUFSIZ];
 /*
  * Line-oriented content detection.
  */
@@ -137,8 +136,15 @@ static struct line_info line_info[] = {
 int main(int argc, char *argv[])
 {
     char c = 'm';
-    struct view *view;
+    char buf[BUFSIZ];
 
+    struct view *view;
+    if (argc < 2) {
+        return;
+    }
+    snprintf(buf, sizeof(buf), FIND_CMD, argv[1]);
+    strcpy(fmt_cmd, buf);
+    
 	init();
             
 	while (view_driver(display[current_view], c)) 
@@ -189,8 +195,10 @@ static bool begin_update(struct view *view)
 {
     if (view->pipe)
         end_update(view);
-    else
+    else {
+        view->cmd = fmt_cmd;
         view->pipe = popen(view->cmd, "r");
+    }
 
     if (!view->pipe)
         return false;
