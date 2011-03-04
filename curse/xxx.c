@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
         return;
     }
     snprintf(buf, sizeof(buf), FIND_CMD, argv[1]);
-    strcpy(fmt_cmd, buf);
+    string_copy(fmt_cmd, buf);
     
 	init();
             
