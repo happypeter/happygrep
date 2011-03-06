@@ -142,6 +142,7 @@ int main(int argc, char *argv[])
 
     struct view *view;
     if (argc < 2) {
+        printf("Usage: %s <an argument>\n", argv[0]);
         return;
     }
     snprintf(buf, sizeof(buf), FIND_CMD, argv[1]);
@@ -514,10 +515,11 @@ static bool default_render(struct view *view, unsigned int lineno)
         snprintf(vim_cmd, sizeof(vim_cmd), VIM_CMD, fnumber, fname);
 		type = LINE_CURSOR;
 		wattrset(view->win, get_line_attr(type));
-	//	wchgat(view->win, -1, 0, type, NULL);
+		wchgat(view->win, -1, 0, type, NULL);
 
 	} else {
 		type = LINE_FILE_LINCON;
+		wchgat(view->win, -1, 0, type, NULL);
 		wattrset(view->win, get_line_attr(LINE_FILE_NAME));
 	}
 
