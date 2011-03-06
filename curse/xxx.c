@@ -538,7 +538,6 @@ static bool default_render(struct view *view, unsigned int lineno)
 	if (type != LINE_CURSOR)
 		wattrset(view->win, A_NORMAL);
 
-	mvwaddch(view->win, lineno, col, ACS_LTEE);
 	wmove(view->win, lineno, col + 2);
 	col += 2;
 
@@ -597,13 +596,12 @@ static int view_driver(struct view *view, int key)
         quit(0);
         break;
     case 'e':
-        addstr("Shelling out...");
+        report("Shelling out...");
         def_prog_mode();           /* save current tty modes */
-        endwin();                  /* restore original tty modes */
-        system(vim_cmd);              /* run shell */
-        addstr("returned.\n");     /* prepare return message */
-        reset_prog_mode();
-        refresh();                 /* restore save modes, repaint screen */
+        endwin();                  /* end curses mode temporarily*/
+        system(vim_cmd);           /* run shell */
+        report("returned");        /* prepare return message */
+        reset_prog_mode();         /* return to the previous tty modes */
         break;
     case 'm':
         open_view(view);
