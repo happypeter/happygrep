@@ -287,7 +287,7 @@ static bool begin_update(struct view *view)
     view->line = 0;
     view->lines = 0;
 
-    return true;
+    return TRUE;
 }
 
 static enum line_type get_line_type(char *line)
@@ -352,7 +352,7 @@ static void init(void)
 	nonl();         /* tell curses not to do NL->CR/NL on output */
 	cbreak();       /* take input chars one at a time, no wait for \n */
 	noecho();       /* don't echo input */
-    leaveok(stdscr, true);
+    leaveok(stdscr, TRUE);
 
 	if (has_colors())
     {
@@ -365,7 +365,7 @@ static void init(void)
     if (!status_win)
         die("failed to create status window");
 
-    keypad(status_win, true);
+    keypad(status_win, TRUE);
     wbkgdset(status_win, get_line_attr(LINE_STATUS));
 
 }
@@ -546,7 +546,7 @@ static bool default_read(struct view *view, char *line)
         return false;
 
     if(!strncmp(line, top, strlen(top))) 
-            return true;
+            return TRUE;
 
     line += 2;
     view->line[view->lines++] = fileinfo;
@@ -562,7 +562,7 @@ static bool default_read(struct view *view, char *line)
         end++;
     string_copy(fileinfo->content, end);
 
-    return true;
+    return TRUE;
 }
   
 static bool default_render(struct view *view, unsigned int lineno)
@@ -625,7 +625,7 @@ static bool default_render(struct view *view, unsigned int lineno)
 
     waddnstr(view->win, fileinfo->content, contentlen);
 
-	return true;
+	return TRUE;
 }
 
 static void open_view(struct view *prev)
@@ -693,7 +693,7 @@ static int view_driver(struct view *view, int key)
 
 static void report(const char *msg, ...)
 {
-    static bool empty = true;
+    static bool empty = TRUE;
     struct view *view = display[current_view];
     if (!empty || *msg) {
         va_list args;
@@ -706,7 +706,7 @@ static void report(const char *msg, ...)
             vwprintw(status_win, msg, args);
             empty = false;
         } else{
-            empty = true;
+            empty = TRUE;
         }
         wrefresh(status_win);
 
