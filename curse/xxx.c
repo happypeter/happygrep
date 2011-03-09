@@ -27,6 +27,58 @@ static void init(void);
 #define ARRAY_SIZE(x)   (sizeof(x) / sizeof(x[0]))
 #define VIM_CMD  "vim +%s %s"
 
+/* User action requests. */
+enum request {
+	/* Offset all requests to avoid conflicts with ncurses getch values. */
+	REQ_OFFSET = KEY_MAX + 1,
+
+	/* XXX: Keep the view request first and in sync with views[]. */
+	REQ_VIEW_MAIN,
+
+	REQ_VIEW_CLOSE,
+	REQ_SCREEN_RESIZE,
+	REQ_OPEN_VIM,
+
+	REQ_MOVE_UP,
+	REQ_MOVE_DOWN,
+};
+
+/**
+ * KEYS
+ * ----
+ * Below the default key bindings are shown.
+ **/
+
+struct keymap {
+    int alias;
+    int request;
+};
+
+static struct keymap keymap[] = {
+    { 'm',      REQ_VIEW_MAIN },
+    { 'q',      REQ_VIEW_CLOSE },
+
+    { 'k',      REQ_MOVE_UP },
+    { 'j',      REQ_MOVE_DOWN },
+
+    { 'e',      REQ_OPEN_VIM},
+
+    /* Use the ncurses SIGWINCH handler. */
+    { KEY_RESIZE,   REQ_SCREEN_RESIZE },
+};
+
+static enum request
+get_request(int key)
+{
+    int i;
+
+    for (i = 0; i < ARRAY_SIZE(keymap); i++)
+        if (keymap[i].alias == key)
+            return keymap[i].request;
+
+    return (enum request) key;
+}
+
 /*
  * String helpers
  */
@@ -70,6 +122,7 @@ static int  update_view(struct view *view);
 static bool begin_update(struct view *view);
 static void end_update(struct view *view);
 static void redraw_view_from(struct view *view, int lineno);
+static void redraw_view(struct view *view);
 static bool default_read(struct view *view, char *line);
 static bool default_render(struct view *view, unsigned int lineno);
 static void report_position(struct view *view, int all);
@@ -77,6 +130,7 @@ static void navigate_view(struct view *view, int request);
 static void move_view(struct view *view, int lines);
 static void update_title_win(struct view *view);
 static void open_view(struct view *prev);
+static void resize_display(void);
 /* declaration end */
 
 
@@ -87,7 +141,7 @@ static struct view main_view = {
 };
 
 /* The display array of active views and the index of the current view. */
-static struct view *display[2];
+static struct view *display[1];
 static unsigned int current_view;
 
 #define foreach_view(view, i) \
@@ -108,12 +162,10 @@ static char vim_cmd[BUFSIZ];
 LINE(DEFAULT,       "",     COLOR_DEFAULT,  COLOR_DEFAULT,  A_NORMAL), \
 LINE(CURSOR,        "",     COLOR_WHITE,    COLOR_GREEN,    A_BOLD), \
 LINE(STATUS,        "",     COLOR_GREEN,    COLOR_DEFAULT,  0), \
-LINE(TITLE_BLUR,    "",     COLOR_WHITE,    COLOR_BLUE,     0), \
 LINE(TITLE_FOCUS,   "",     COLOR_WHITE,    COLOR_BLUE,     A_BOLD), \
 LINE(FILE_NAME,     "",     COLOR_BLUE,     COLOR_DEFAULT,  0), \
 LINE(FILE_LINUM,    "",     COLOR_GREEN,    COLOR_DEFAULT,  0), \
 LINE(FILE_LINCON,   "",     COLOR_DEFAULT,  COLOR_DEFAULT,  0), \
-LINE(FILE_DELIM,    "",     COLOR_MAGENTA,  COLOR_DEFAULT,  0),
 
 enum line_type {
 #define LINE(type, line, fg, bg, attr) \
@@ -135,10 +187,23 @@ static struct line_info line_info[] = {
 #undef  LINE
 };
 
+static void redraw_display(bool clear)
+{
+    struct view *view;
+    view = display[0];
+
+    if (clear)
+        wclear(view->win);
+    redraw_view(view);
+    update_title_win(view);
+}
+
 int main(int argc, char *argv[])
 {
-    char c = 'm';
+    char c;
     char buf[BUFSIZ];
+    enum request request; 
+    request = REQ_VIEW_MAIN; 
 
     struct view *view;
     if (argc < 2) {
@@ -150,7 +215,7 @@ int main(int argc, char *argv[])
     
 	init();
             
-	while (view_driver(display[current_view], c)) 
+	while (view_driver(display[current_view], request)) 
     {
         int i;
 
@@ -158,6 +223,18 @@ int main(int argc, char *argv[])
             update_view(view);
 
         c = wgetch(status_win);     
+        request = get_request(c);
+        
+        if ( request == REQ_SCREEN_RESIZE) {
+
+            int height, width;
+
+            getmaxyx(stdscr, height, width);
+
+            wresize(status_win, 1, width);
+            mvwin(status_win, height - 1, 0);
+            wrefresh(status_win);
+        }
     }
 
 	quit(0);
@@ -309,51 +386,42 @@ static void update_title_win(struct view *view)
             (view->lineno + 1) * 100 / view->lines);
     }
 
+    wclrtoeol(view->title);
     wrefresh(view->title);
 }
 
 static void resize_display(void)
 {
-    int offset, i;
+    int i;
     struct view *base = display[0];
-    struct view *view = display[1] ? display[1] : display[0];
 
     /* Setup window dimensions */
 
     getmaxyx(stdscr, base->height, base->width);
 
-    /* Make room for the status window. */
-    base->height -= 1;
+    /* Keep the height of all view->win windows one larger than is
+     * required so that the cursor can wrap-around on the last line
+     * without scrolling the window. */
+    if (!base->win) {
+        base->win = newwin(base->height - 1, 0, 0, 0);
+        if (!base->win)
+            die("Failed to create %s view", base->name);
 
-    /* Make room for the title bar. */
-    base->height -= 1;
+        scrollok(base->win, TRUE);
 
-    offset = 0;
+        base->title = newwin(1, 0, base->height - 2, 0);
+        if (!base->title)
+            die("Failed to create title window");
 
-    foreach_view (view, i) {
-        /* Keep the height of all view->win windows one larger than is
-         * required so that the cursor can wrap-around on the last line
-         * without scrolling the window. */
-        if (!view->win) {
-            view->win = newwin(view->height + 1, 0, offset, 0);
-            if (!view->win)
-                die("Failed to create %s view", view->name);
-
-            scrollok(view->win, TRUE);
-
-            view->title = newwin(1, 0, offset + view->height, 0);
-            if (!view->title)
-                die("Failed to create title window");
-
-        } else {
-            wresize(view->win, view->height + 1, view->width);
-            mvwin(view->win,   offset, 0);
-            mvwin(view->title, offset + view->height, 0);
-            wrefresh(view->win);
-        }
-
-        offset += view->height + 1;
+    } else {
+        wresize(base->win, base->height - 2, base->width);
+        mvwin(base->win, 0, 0);
+        wrefresh(base->win);
+        wresize(base->title, 1, base->width);
+        mvwin(base->title, base->height - 2, 0);
+        wrefresh(base->title);
     }
+
 }
 
 static int update_view(struct view *view)
@@ -442,6 +510,12 @@ static void redraw_view_from(struct view *view, int lineno)
 	wrefresh(view->win);
 }
 
+static void redraw_view(struct view *view)
+{
+    wclear(view->win);
+    redraw_view_from(view, 0);
+}
+
 struct fileinfo {
 	char name[65];		
 	char content[85];
@@ -526,7 +600,7 @@ static bool default_render(struct view *view, unsigned int lineno)
 	waddstr(view->win, fileinfo->name);
     namelen = strlen(fileinfo->name);
 
-    col += 5;
+    col += 20;
 	wmove(view->win, lineno, col);
 	if (type != LINE_CURSOR)
 		wattrset(view->win, get_line_attr(LINE_FILE_LINUM));
@@ -546,8 +620,8 @@ static bool default_render(struct view *view, unsigned int lineno)
 
     int contentlen = strlen(fileinfo->content);
 
-    if (col + contentlen > view->width-5*col)
-        contentlen = view->width - 2*col;
+    if (col + contentlen > view->width)
+        contentlen = view->width - col - 20;
 
     waddnstr(view->win, fileinfo->content, contentlen);
 
@@ -587,25 +661,29 @@ static int view_driver(struct view *view, int key)
 {
 	switch (key) 
     {
-	case 'j':
-	case 'k':
+	case REQ_MOVE_DOWN:
+	case REQ_MOVE_UP:
 		if (view)
 			navigate_view(view, key);
 		break;
-	case 'q':
+	case REQ_VIEW_CLOSE:
         quit(0);
         break;
-    case 'e':
+    case REQ_OPEN_VIM:
         report("Shelling out...");
         def_prog_mode();           /* save current tty modes */
-        endwin();                  /* end curses mode temporarily*/
+        endwin();                  /* end curses mode temporarily */
         system(vim_cmd);           /* run shell */
         report("returned");        /* prepare return message */
         reset_prog_mode();         /* return to the previous tty modes */
         break;
-    case 'm':
+    case REQ_VIEW_MAIN: 
         open_view(view);
         break;
+    case REQ_SCREEN_RESIZE:
+        resize_display();
+        break;
+
 	default:
 		return TRUE;
 	}
@@ -648,11 +726,11 @@ static void navigate_view(struct view *view, int request)
 
 	switch (request) {
 
-	case 'k':
+	case REQ_MOVE_UP:
 		steps = -1;
 		break;
 
-	case 'j':
+	case REQ_MOVE_DOWN:
 		steps = 1;
 		break;
 	}
