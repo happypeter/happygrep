@@ -95,7 +95,7 @@ string_ncopy(char *dst, const char *src, int dstlen)
 	string_ncopy(dst, src, sizeof(dst))
 
 struct view {
-	char *name;
+	const char *name;
 
 	/* Rendering */
     bool (*read)(struct view *view, char *line);
@@ -110,8 +110,8 @@ struct view {
 
 	/* Buffering */
 	unsigned long lines;	/* Total number of lines */
-	char **line;		/* Line index */
-    char *cmd;
+	void **line;		/* Line index */
+    const char *cmd;
 
 	/* Loading */
 	FILE *pipe;
@@ -428,7 +428,7 @@ static int update_view(struct view *view)
 {
 	char buffer[BUFSIZ];
 	char *line;
-	char **tmp;
+	void **tmp;
 	int redraw_from = -1;
 	unsigned long lines = view->height;
 
