@@ -200,7 +200,8 @@ static void redraw_display(bool clear)
 
 int main(int argc, char *argv[])
 {
-    char c;
+    int c; /* c must be int not char, because the value of KEY_RESIZE is 632. */
+
     char buf[BUFSIZ];
     enum request request; 
     request = REQ_VIEW_MAIN; 
@@ -682,6 +683,7 @@ static int view_driver(struct view *view, int key)
         break;
     case REQ_SCREEN_RESIZE:
         resize_display();
+        redraw_display(TRUE);
         break;
 
 	default:
