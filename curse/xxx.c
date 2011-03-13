@@ -123,6 +123,7 @@ static bool begin_update(struct view *view);
 static void end_update(struct view *view);
 static void redraw_view_from(struct view *view, int lineno);
 static void redraw_view(struct view *view);
+static void redraw_display(bool clear);
 static bool default_read(struct view *view, char *line);
 static bool default_render(struct view *view, unsigned int lineno);
 static void report_position(struct view *view, int all);
@@ -132,7 +133,6 @@ static void update_title_win(struct view *view);
 static void open_view(struct view *prev);
 static void resize_display(void);
 /* declaration end */
-
 
 static struct view main_view = {
     "main", 
@@ -151,6 +151,7 @@ static bool cursed = false;
 static WINDOW *status_win; 
 static char fmt_cmd[BUFSIZ];
 static char vim_cmd[BUFSIZ];
+
 /*
  * Line-oriented content detection.
  */
@@ -291,6 +292,12 @@ static bool begin_update(struct view *view)
     return TRUE;
 }
 
+static void end_update(struct view *view)
+{
+	pclose(view->pipe);
+	view->pipe = NULL;
+}
+
 static enum line_type get_line_type(char *line)
 {
     int linelen = strlen(line);
@@ -371,7 +378,6 @@ static void init(void)
 
 }
 
-
 static void update_title_win(struct view *view)
 {
     if (view == display[current_view])
@@ -399,30 +405,30 @@ static void resize_display(void)
     /* Setup window dimensions */
 
     getmaxyx(stdscr, base->height, base->width);
+    
+    base->height -= 1; // space for status window
 
-    /* Keep the height of all view->win windows one larger than is
-     * required so that the cursor can wrap-around on the last line
-     * without scrolling the window. */
+    base->height -= 1; // space for title bar
+
     if (!base->win) {
-        base->win = newwin(base->height - 1, 0, 0, 0);
+        base->win = newwin(base->height + 1, 0, 0, 0);
         if (!base->win)
             die("Failed to create %s view", base->name);
 
         scrollok(base->win, TRUE);
 
-        base->title = newwin(1, 0, base->height - 2, 0);
+        base->title = newwin(1, 0, base->height, 0);
         if (!base->title)
             die("Failed to create title window");
 
     } else {
-        wresize(base->win, base->height - 2, base->width);
+        wresize(base->win, base->height + 1, base->width);
         mvwin(base->win, 0, 0);
         wrefresh(base->win);
         wresize(base->title, 1, base->width);
-        mvwin(base->title, base->height - 2, 0);
+        mvwin(base->title, base->height, 0);
         wrefresh(base->title);
     }
-
 }
 
 static int update_view(struct view *view)
@@ -432,6 +438,7 @@ static int update_view(struct view *view)
 	void **tmp;
 	int redraw_from = -1;
 	unsigned long lines = view->height;
+    char *top = "Binary file";
 
 	if (!view->pipe)
 		return TRUE;
@@ -453,6 +460,9 @@ static int update_view(struct view *view)
 
 		if (linelen)
 			line[linelen - 1] = 0;
+
+        if(!strncmp(line, top, strlen(top))) 
+            continue;
 
 		if (!view->read(view, line))
 			goto alloc_error;
@@ -493,12 +503,6 @@ end:
 	return FALSE;
 }
 
-static void end_update(struct view *view)
-{
-	pclose(view->pipe);
-	view->pipe = NULL;
-}
-
 static void redraw_view_from(struct view *view, int lineno)
 {
 	assert(0 <= lineno && lineno < view->height);
@@ -524,8 +528,9 @@ struct fileinfo {
 };
 
 static char word[BUFSIZ];
+static int length;
 
-char *strsplit(const char *line, const char c)
+static char *strsplit(const char *line, const char c)
 {
     int i = 0;
     while (*line != c) {
@@ -536,18 +541,29 @@ char *strsplit(const char *line, const char c)
     return word;
 }
 
+static int strlength (const char *term)
+{
+    int i = 0;
+    const char *c = term;
+    while (*c != '\0') {
+        if (*c == '\t')
+            i += 4;
+        else
+            i++;
+        c++;
+    }
+    length = i;
+    return length;
+}
+        
 static bool default_read(struct view *view, char *line)
 {
 	struct fileinfo *fileinfo;
-    char *top = "Binary file";
     char *end;
 
     fileinfo= calloc(1, sizeof(struct fileinfo));
     if (!fileinfo)
         return false;
-
-    if(!strncmp(line, top, strlen(top))) 
-            return TRUE;
 
     line += 2;
     view->line[view->lines++] = fileinfo;
@@ -619,10 +635,10 @@ static bool default_render(struct view *view, unsigned int lineno)
 	if (type != LINE_CURSOR)
 		wattrset(view->win, get_line_attr(type));
 
-    int contentlen = strlen(fileinfo->content);
+    int contentlen = strlength(fileinfo->content);
 
     if (col + contentlen > view->width)
-        contentlen = view->width - col - 20;
+        contentlen = view->width - col - 40;
 
     waddnstr(view->win, fileinfo->content, contentlen);
 
