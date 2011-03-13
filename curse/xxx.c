@@ -547,7 +547,7 @@ static int strlength (const char *term)
     const char *c = term;
     while (*c != '\0') {
         if (*c == '\t')
-            i += 4;
+            i += 8;
         else
             i++;
         c++;
@@ -638,7 +638,7 @@ static bool default_render(struct view *view, unsigned int lineno)
     int contentlen = strlength(fileinfo->content);
 
     if (col + contentlen > view->width)
-        contentlen = view->width - col - 40;
+        contentlen = view->width - col - 20;
 
     waddnstr(view->win, fileinfo->content, contentlen);
 
