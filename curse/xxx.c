@@ -19,7 +19,9 @@ static void init(void);
 // annoying is the "\\" escape sign, why double? C string needs one for "\" and
 // bash needs another for "(", "!" and ")"
 #define FIND_CMD \
-"find . -type d -name .git -prune -o \\( \\! -name *.swp \\) -exec grep -in %s {} +"
+"find . -name .git -prune -o \\( \\! -name *.swp \\) -exec grep -in %s {} +"
+#define FIND_CMDD \
+"find . -name %s -prune -o \\( \\! -name *.swp \\) -exec grep -in %s {} +"
 
 #define COLOR_DEFAULT  (-1)
 #define ABS(x) ((x) >=0 ? (x) : -(x))
@@ -167,6 +169,7 @@ LINE(TITLE_FOCUS,   "",     COLOR_WHITE,    COLOR_BLUE,     A_BOLD), \
 LINE(FILE_NAME,     "",     COLOR_BLUE,     COLOR_DEFAULT,  0), \
 LINE(FILE_LINUM,    "",     COLOR_GREEN,    COLOR_DEFAULT,  0), \
 LINE(FILE_LINCON,   "",     COLOR_DEFAULT,  COLOR_DEFAULT,  0), \
+LINE(ERR,           "",        COLOR_RED,      COLOR_DEFAULT,  0), \
 
 enum line_type {
 #define LINE(type, line, fg, bg, attr) \
@@ -209,11 +212,18 @@ int main(int argc, char *argv[])
 
     struct view *view;
     if (argc < 2) {
-        printf("Usage: %s <an argument>\n", argv[0]);
+        printf("Usage: %s <dir/filename> <keyword>\n", argv[0]);
         return;
     }
-    snprintf(buf, sizeof(buf), FIND_CMD, argv[1]);
-    string_copy(fmt_cmd, buf);
+    signal(SIGINT, quit);
+
+    if (argc == 3) {
+        snprintf(buf, sizeof(buf), FIND_CMDD, argv[1], argv[2]);
+        string_copy(fmt_cmd, buf);
+    }else{
+        snprintf(buf, sizeof(buf), FIND_CMD, argv[1]);
+        string_copy(fmt_cmd, buf);
+    }
     
 	init();
             
@@ -713,6 +723,7 @@ static void report(const char *msg, ...)
 {
     static bool empty = TRUE;
     struct view *view = display[current_view];
+    enum line_type type;
     if (!empty || *msg) {
         va_list args;
 
@@ -735,6 +746,10 @@ static void report(const char *msg, ...)
     if (view->lines) {
         wmove(view->win, view->lineno - view->offset, view->width - 1);
         wrefresh(view->win);
+    } else {
+        type = LINE_ERR;
+		wattrset(view->win, get_line_attr(LINE_ERR));
+        wprintw(view->win, "keyword was not found in the current directory!");
     }
 }
 
