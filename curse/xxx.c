@@ -746,11 +746,7 @@ static void report(const char *msg, ...)
     if (view->lines) {
         wmove(view->win, view->lineno - view->offset, view->width - 1);
         wrefresh(view->win);
-    } else {
-        type = LINE_ERR;
-		wattrset(view->win, get_line_attr(LINE_ERR));
-        wprintw(view->win, "keyword was not found in the current directory!");
-    }
+    } 
 }
 
 static void navigate_view(struct view *view, int request)
