@@ -650,7 +650,10 @@ static bool default_render(struct view *view, unsigned int lineno)
     if (col + contentlen > view->width)
         contentlen = view->width - col - 20;
 
-    waddnstr(view->win, fileinfo->content, contentlen);
+    if (contentlen > 0)
+        waddnstr(view->win, fileinfo->content, contentlen);
+    else 
+        waddnstr(view->win, fileinfo->content, 4);
 
 	return TRUE;
 }
