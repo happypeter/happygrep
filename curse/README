@@ -6,3 +6,10 @@ Next:
 
     make
     sudo make install
+
+BUG:
+    when using chinese version ubuntu
+    if you have binary file in working dir
+    xxx will end with segfault
+
+    the fix is: rm thebinary
