@@ -2,7 +2,7 @@ first install these packages:
 
     sudo apt-get install libncurses5 libncurses5-dev
 
-now:
+Next:
 
     make
     sudo make install
