@@ -8,6 +8,10 @@
 #include <stdarg.h>
 #include <unistd.h>
 
+#include <locale.h>
+#include <langinfo.h>
+#include <iconv.h>
+
 #include <curses.h>
 
 static void die(const char *err, ...);
@@ -24,10 +28,22 @@ static void init(void);
 "find . -name %s -prune -o \\( \\! -name *.swp \\) -exec grep -in %s {} +"
 
 #define COLOR_DEFAULT  (-1)
+
 #define ABS(x) ((x) >=0 ? (x) : -(x))
 #define MIN(x) ((x) <= (y) ? (x) : (y))
 #define ARRAY_SIZE(x)   (sizeof(x) / sizeof(x[0]))
 #define VIM_CMD  "vim +%s %s"
+
+#define SIZEOF_STR	1024	/* Default string size. */
+
+#define ICONV_NONE	((iconv_t) -1)
+#ifndef ICONV_CONST
+#define ICONV_CONST	/* nothing */
+#endif
+
+static char opt_encoding[20]		= "UTF-8";
+static iconv_t opt_iconv_in	= ICONV_NONE;
+static iconv_t opt_iconv_out = ICONV_NONE;
 
 /* User action requests. */
 enum request {
@@ -120,7 +136,7 @@ struct view {
 };
 
 static int view_driver(struct view *view, int key);
-static int  update_view(struct view *view);
+static int update_view(struct view *view);
 static bool begin_update(struct view *view);
 static void end_update(struct view *view);
 static void redraw_view_from(struct view *view, int lineno);
@@ -204,19 +220,17 @@ static void redraw_display(bool clear)
 
 int main(int argc, char *argv[])
 {
+	const char *codeset = "UTF-8";
     int c; /* c must be int not char, because the value of KEY_RESIZE is 632. */
-
     char buf[BUFSIZ];
     enum request request; 
     request = REQ_VIEW_MAIN; 
-
     struct view *view;
+
     if (argc < 2) {
         printf("Usage: %s <dir/filename> <keyword>\n", argv[0]);
         return;
     }
-    signal(SIGINT, quit);
-
     if (argc == 3) {
         snprintf(buf, sizeof(buf), FIND_CMDD, argv[1], argv[2]);
         string_copy(fmt_cmd, buf);
@@ -224,6 +238,24 @@ int main(int argc, char *argv[])
         snprintf(buf, sizeof(buf), FIND_CMD, argv[1]);
         string_copy(fmt_cmd, buf);
     }
+
+    signal(SIGINT, quit);
+
+	if (setlocale(LC_ALL, "")) {
+		codeset = nl_langinfo(CODESET);
+	}
+
+	if (*opt_encoding && strcmp(codeset, "UTF-8")) {
+		opt_iconv_in = iconv_open("UTF-8", opt_encoding);
+		if (opt_iconv_in == ICONV_NONE)
+			die("Failed to initialize character set conversion");
+	}
+
+	if (codeset && strcmp(codeset, "UTF-8")) {
+		opt_iconv_out = iconv_open(codeset, "UTF-8");
+		if (opt_iconv_out == ICONV_NONE)
+			die("Failed to initialize character set conversion");
+	}
     
 	init();
             
@@ -557,7 +589,7 @@ static int strlength (const char *term)
     const char *c = term;
     while (*c != '\0') {
         if (*c == '\t')
-            i += 8;
+            i += 4;
         else
             i++;
         c++;
