@@ -12,7 +12,7 @@
 #include <langinfo.h>
 #include <iconv.h>
 
-#include <curses.h>
+#include <ncursesw/ncurses.h>
 
 static void die(const char *err, ...);
 static void quit(int sig);
@@ -221,7 +221,8 @@ static void redraw_display(bool clear)
 int main(int argc, char *argv[])
 {
 	const char *codeset = "UTF-8";
-    int c; /* c must be int not char, because the value of KEY_RESIZE is 632. */
+    /* c must be int not char, because the value of KEY_RESIZE is 632. */
+    int c;
     char buf[BUFSIZ];
     enum request request; 
     request = REQ_VIEW_MAIN; 

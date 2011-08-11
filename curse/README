@@ -1,6 +1,6 @@
 first install these packages:
 
-    sudo apt-get install libncurses5 libncurses5-dev
+    sudo apt-get install libncurses5 libncurses5-dev 
 
 Next:
 
@@ -13,3 +13,13 @@ BUG:
     xxx will end with segfault
 
     the fix is: rm thebinary
+
+Now, it can display Chinese. Just use the shared library libncursesw.so.5, not
+libncurses.so.5, so you need run the command below to compile the programme.
+
+    gcc xxx.c -o xxx -lncursesw 
+
+If there is no libncursesw.so.5 in your OS, you should install it first.
+
+    sudo apt-get install libncursesw5-dev
+
