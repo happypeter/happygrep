@@ -1,5 +1,6 @@
 ## install
-firstly, install dependencies:
+
+Firstly, install dependencies:
 
     sudo apt-get install libncurses5 libncurses5-dev
 
@@ -14,7 +15,6 @@ finally copy the binary `xxx` to once of the $PATH places
 NOTE: the $HOME/bin is a nice place to install your own made app, since no `sudo` is needed
 and on ubuntu, you don't need to modify $PATH to make it work, it is just one of the defaults.
 
-
 ## dev note
 
 If you've configured your ncurses with --enable-sigwinch, then you can go the 
@@ -23,3 +23,13 @@ KEY_RESIZE. When ncurses handles the SIGWINCH signal, it pushes a KEY_RESIZE
 back onto the queue that getch() uses, so that the next call to getch() will 
 return that value. However, not everyone's ncurses library has been configured 
 with that switch, so relying on that behavior is not portable.
+
+## article about unicode 
+
+http://www.cprogramming.com/tutorial/unicode.html
+
+http://www.cl.cam.ac.uk/~mgk25/unicode.html
+
+https://help.ubuntu.com/community/Locale
+
+http://developers.sun.com/dev/gadc/technicalpublications/articles/utf8.html
