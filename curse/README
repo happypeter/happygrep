@@ -10,9 +10,10 @@ Next:
 BUG:
     when using chinese version ubuntu
     if you have binary file in working dir
-    xxx will end with segfault
+    xxx will end with segfault. 
 
-    the fix is: rm thebinary
+    Now the bug above is fixed. You don't need to delete the binary file. 
+
 
 Now, it can display Chinese. Just use the shared library libncursesw.so.5, not
 libncurses.so.5, so you need run the command below to compile the programme.

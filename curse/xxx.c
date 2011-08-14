@@ -482,6 +482,7 @@ static int update_view(struct view *view)
 	int redraw_from = -1;
 	unsigned long lines = view->height;
     char *top = "Binary file";
+    char delimiter = ':';
 
 	if (!view->pipe)
 		return TRUE;
@@ -506,6 +507,10 @@ static int update_view(struct view *view)
 
         if(!strncmp(line, top, strlen(top))) 
             continue;
+
+        /* solve the segfault in ubuntu with chinese locale. */
+        if(!strchr(line, delimiter))  
+            continue                   
 
 		if (!view->read(view, line))
 			goto alloc_error;
