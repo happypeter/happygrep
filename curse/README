@@ -24,3 +24,14 @@ If there is no libncursesw.so.5 in your OS, you should install it first.
 
     sudo apt-get install libncursesw5-dev
 
+MAC:
+
+    since I do not know how to install dev headers for ncurses on mac, so I stupidly copied the 
+
+        ncurses.h
+
+    from a linux machine, and then use
+
+        gcc -I.
+
+    it sucks.
