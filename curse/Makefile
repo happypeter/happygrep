@@ -1,5 +1,5 @@
 all:
-	gcc -o xxx xxx.c -lncursesw -g
+	gcc xxx.c -o xxx -lncursesw -g 
 
 install:
 	mv xxx /bin

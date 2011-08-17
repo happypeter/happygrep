@@ -510,7 +510,7 @@ static int update_view(struct view *view)
 
         /* solve the segfault in ubuntu with chinese locale. */
         if(!strchr(line, delimiter))  
-            continue                   
+            continue;                   
 
 		if (!view->read(view, line))
 			goto alloc_error;
@@ -577,6 +577,7 @@ struct fileinfo {
 
 static char word[BUFSIZ];
 static int length;
+static char localname[512];
 
 static char *strsplit(const char *line, const char c)
 {
@@ -589,19 +590,43 @@ static char *strsplit(const char *line, const char c)
     return word;
 }
 
-static int strlength (const char *term)
+static int strlength(const char *term)
 {
     int i = 0;
     const char *c = term;
     while (*c != '\0') {
         if (*c == '\t')
-            i += 4;
+            i += 8;
         else
             i++;
         c++;
     }
     length = i;
     return length;
+}
+/* when a file name containing blankspace, vim will consider 
+ * it as more than one file, in order to fix this problem, 
+ * so the function below renames the filename using '\ ' 
+ * to instead of ' ', then vim can read the file.
+ */
+static char *blankspace(const char *fname)
+{
+    const char *tmp = fname; 
+    int i, j;
+    int len = strlen(tmp);
+
+    for (i = 0, j = 0; j < len; tmp++, j++)
+    {
+        if (*tmp == ' ')
+        {
+            localname[i++] = '\\';
+            localname[i++] = *tmp;
+            continue;
+        }
+        localname[i++] = *tmp;
+    }
+    localname[i] = '\0';
+    return localname;
 }
         
 static bool default_read(struct view *view, char *line)
@@ -650,7 +675,7 @@ static bool default_render(struct view *view, unsigned int lineno)
 
 	if (view->offset + lineno == view->lineno) {
         fnumber = fileinfo->number;
-        fname = fileinfo->name;
+        fname = blankspace(fileinfo->name);
         snprintf(vim_cmd, sizeof(vim_cmd), VIM_CMD, fnumber, fname);
 		type = LINE_CURSOR;
 		wattrset(view->win, get_line_attr(type));
