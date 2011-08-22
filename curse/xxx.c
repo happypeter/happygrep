@@ -45,6 +45,8 @@ static char opt_encoding[20]		= "UTF-8";
 static iconv_t opt_iconv_in	= ICONV_NONE;
 static iconv_t opt_iconv_out = ICONV_NONE;
 
+static int opt_tab_size = 8;
+
 /* User action requests. */
 enum request {
 	/* Offset all requests to avoid conflicts with ncurses getch values. */
@@ -59,6 +61,12 @@ enum request {
 
 	REQ_MOVE_UP,
 	REQ_MOVE_DOWN,
+};
+
+struct fileinfo {
+	char name[128];		
+	char content[128];
+    char number[6];
 };
 
 /**
@@ -181,11 +189,12 @@ static char vim_cmd[BUFSIZ];
 LINE(DEFAULT,       "",     COLOR_DEFAULT,  COLOR_DEFAULT,  A_NORMAL), \
 LINE(CURSOR,        "",     COLOR_WHITE,    COLOR_GREEN,    A_BOLD), \
 LINE(STATUS,        "",     COLOR_GREEN,    COLOR_DEFAULT,  0), \
+LINE(DELIMITER,	    "",		COLOR_MAGENTA,	COLOR_DEFAULT,	0), \
 LINE(TITLE_FOCUS,   "",     COLOR_WHITE,    COLOR_BLUE,     A_BOLD), \
 LINE(FILE_NAME,     "",     COLOR_BLUE,     COLOR_DEFAULT,  0), \
 LINE(FILE_LINUM,    "",     COLOR_GREEN,    COLOR_DEFAULT,  0), \
 LINE(FILE_LINCON,   "",     COLOR_DEFAULT,  COLOR_DEFAULT,  0), \
-LINE(ERR,           "",        COLOR_RED,      COLOR_DEFAULT,  0), \
+LINE(ERR,           "",     COLOR_RED,      COLOR_DEFAULT,  0), \
 
 enum line_type {
 #define LINE(type, line, fg, bg, attr) \
@@ -423,11 +432,15 @@ static void init(void)
 
 static void update_title_win(struct view *view)
 {
+    int len;
+
     if (view == display[current_view])
         wbkgdset(view->title, get_line_attr(LINE_TITLE_FOCUS));
 
     werase(view->title);
     wmove(view->title, 0, 0);
+    wprintw(view->title, "[filename]");
+    wmove(view->title, 0, 12);
 
     if (view->lines) { 
         wprintw(view->title, "line %d of %d (%d%%)",
@@ -569,19 +582,13 @@ static void redraw_view(struct view *view)
     redraw_view_from(view, 0);
 }
 
-struct fileinfo {
-	char name[65];		
-	char content[85];
-    char number[5];
-};
-
-static char word[BUFSIZ];
 static int length;
-static char localname[512];
 
 static char *strsplit(const char *line, const char c)
 {
     int i = 0;
+    static char word[BUFSIZ];
+    memset(word, 0, sizeof(word));
     while (*line != c) {
         word[i++] = *line;
         line++;
@@ -596,7 +603,7 @@ static int strlength(const char *term)
     const char *c = term;
     while (*c != '\0') {
         if (*c == '\t')
-            i += 8;
+            i += opt_tab_size;
         else
             i++;
         c++;
@@ -613,11 +620,13 @@ static char *blankspace(const char *fname)
 {
     const char *tmp = fname; 
     int i, j;
+    static char localname[512];
     int len = strlen(tmp);
-
+    
+    memset(localname, 0, sizeof(localname));
     for (i = 0, j = 0; j < len; tmp++, j++)
     {
-        if (*tmp == ' ')
+        if (isspace(*tmp))
         {
             localname[i++] = '\\';
             localname[i++] = *tmp;
@@ -627,6 +636,28 @@ static char *blankspace(const char *fname)
     }
     localname[i] = '\0';
     return localname;
+}
+
+static inline size_t
+string_expand(char *dst, size_t dstlen, const char *src, int tabsize)
+{
+	size_t size, pos;
+
+	for (size = pos = 0; size < dstlen - 1 && src[pos]; pos++) {
+		if (src[pos] == '\t') {
+			size_t expanded = tabsize - (size % tabsize);
+
+			if (expanded + size >= dstlen - 1)
+				expanded = dstlen - size - 1;
+			memcpy(dst + size, "        ", expanded);
+			size += expanded;
+		} else {
+			dst[size++] = src[pos];
+		}
+	}
+
+	dst[size] = 0;
+	return pos;
 }
         
 static bool default_read(struct view *view, char *line)
@@ -648,13 +679,13 @@ static bool default_read(struct view *view, char *line)
 
     end = strchr(end, ':');
     end += 1;
-    while (*end == ' ') 
+    while (isspace(*end)) 
         end++;
     string_copy(fileinfo->content, end);
 
     return TRUE;
 }
-  
+
 static bool default_render(struct view *view, unsigned int lineno)
 {
 	struct fileinfo *fileinfo;
@@ -663,6 +694,8 @@ static bool default_render(struct view *view, unsigned int lineno)
 	size_t numberlen;
 	size_t namelen;
     char *fname, *fnumber;
+    int opt_file_name = 25;
+	char text[SIZEOF_STR];
 
 	if (view->offset + lineno >= view->lines)
 		return false;
@@ -683,40 +716,53 @@ static bool default_render(struct view *view, unsigned int lineno)
 
 	} else {
 		type = LINE_FILE_LINCON;
-		wchgat(view->win, -1, 0, type, NULL);
+        wchgat(view->win, -1, 0, type, NULL);
 		wattrset(view->win, get_line_attr(LINE_FILE_NAME));
 	}
 
-	waddstr(view->win, fileinfo->name);
     namelen = strlen(fileinfo->name);
+    if (namelen > opt_file_name){
+    	waddnstr(view->win, fileinfo->name, opt_file_name);
+	    if (type != LINE_CURSOR)
+            wattrset(view->win, get_line_attr(LINE_DELIMITER));
+        waddch(view->win, '~');
+    }
+    else
+        waddstr(view->win, fileinfo->name);
 
-    col += 20;
+    col += opt_file_name + 2;
 	wmove(view->win, lineno, col);
 	if (type != LINE_CURSOR)
 		wattrset(view->win, get_line_attr(LINE_FILE_LINUM));
 
 	waddstr(view->win, fileinfo->number);
-    numberlen = strlen(fileinfo->number);
 
-    col += 7;
+    col += 9;
 	if (type != LINE_CURSOR)
 		wattrset(view->win, A_NORMAL);
 
-	wmove(view->win, lineno, col + 2);
-	col += 2;
+	wmove(view->win, lineno, col);
 
 	if (type != LINE_CURSOR)
 		wattrset(view->win, get_line_attr(type));
 
     int contentlen = strlength(fileinfo->content);
+    string_expand(text, sizeof(text), fileinfo->content, opt_tab_size);
 
-    if (col + contentlen > view->width)
-        contentlen = view->width - col - 20;
-
-    if (contentlen > 0)
-        waddnstr(view->win, fileinfo->content, contentlen);
-    else 
-        waddnstr(view->win, fileinfo->content, 4);
+    if (col + contentlen > view->width){
+        contentlen = view->width - col;
+        if (contentlen < 0)
+            return TRUE;
+        else {
+            waddnstr(view->win, text, contentlen-1);
+            if (type != LINE_CURSOR)
+                wattrset(view->win, get_line_attr(LINE_DELIMITER));
+            waddch(view->win, '~');
+        }
+    }
+    else { 
+        waddstr(view->win, fileinfo->content);
+    }
 
 	return TRUE;
 }
