@@ -704,11 +704,11 @@ static bool default_render(struct view *view, unsigned int lineno)
 	if (!*fileinfo->name)
 		return false;
 
+    fnumber = fileinfo->number;
+    fname = blankspace(fileinfo->name);
 	wmove(view->win, lineno, col);
 
 	if (view->offset + lineno == view->lineno) {
-        fnumber = fileinfo->number;
-        fname = blankspace(fileinfo->name);
         snprintf(vim_cmd, sizeof(vim_cmd), VIM_CMD, fnumber, fname);
 		type = LINE_CURSOR;
 		wattrset(view->win, get_line_attr(type));
@@ -722,10 +722,13 @@ static bool default_render(struct view *view, unsigned int lineno)
 
     namelen = strlen(fileinfo->name);
     if (namelen > opt_file_name){
-    	waddnstr(view->win, fileinfo->name, opt_file_name);
+        int n = namelen-opt_file_name;
 	    if (type != LINE_CURSOR)
             wattrset(view->win, get_line_attr(LINE_DELIMITER));
         waddch(view->win, '~');
+	    if (type != LINE_CURSOR)
+            wattrset(view->win, get_line_attr(LINE_FILE_NAME));
+    	waddnstr(view->win, fileinfo->name + n, opt_file_name);
     }
     else
         waddstr(view->win, fileinfo->name);
