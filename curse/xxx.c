@@ -152,7 +152,6 @@ static void redraw_view(struct view *view);
 static void redraw_display(bool clear);
 static bool default_read(struct view *view, char *line);
 static bool default_render(struct view *view, unsigned int lineno);
-static void report_position(struct view *view, int all);
 static void navigate_view(struct view *view, int request);
 static void move_view(struct view *view, int lines);
 static void update_title_win(struct view *view);
@@ -239,7 +238,7 @@ int main(int argc, char *argv[])
 
     if (argc < 2) {
         printf("Usage: %s <dir/filename> <keyword>\n", argv[0]);
-        return;
+        return 0;
     }
     if (argc == 3) {
         snprintf(buf, sizeof(buf), FIND_CMDD, argv[1], argv[2]);
@@ -350,20 +349,6 @@ static void end_update(struct view *view)
 	view->pipe = NULL;
 }
 
-static enum line_type get_line_type(char *line)
-{
-    int linelen = strlen(line);
-    enum line_type type;
-
-    for (type = 0; type < ARRAY_SIZE(line_info); type++)
-        /* Case insensitive search matches Signed-off-by lines better. */
-        if (linelen >= line_info[type].linelen &&
-            !strncasecmp(line_info[type].line, line, line_info[type].linelen))
-            return type;
-
-    return LINE_DEFAULT;
-}
-
 static inline int get_line_attr(enum line_type type)
 {
     assert(type < ARRAY_SIZE(line_info));
@@ -432,8 +417,6 @@ static void init(void)
 
 static void update_title_win(struct view *view)
 {
-    int len;
-
     if (view == display[current_view])
         wbkgdset(view->title, get_line_attr(LINE_TITLE_FOCUS));
 
@@ -455,7 +438,6 @@ static void update_title_win(struct view *view)
 
 static void resize_display(void)
 {
-    int i;
     struct view *base = display[0];
 
     /* Setup window dimensions */
@@ -691,7 +673,6 @@ static bool default_render(struct view *view, unsigned int lineno)
 	struct fileinfo *fileinfo;
 	enum line_type type;
 	int col = 0;
-	size_t numberlen;
 	size_t namelen;
     char *fname, *fnumber;
     int opt_file_name = 25;
@@ -838,7 +819,6 @@ static void report(const char *msg, ...)
 {
     static bool empty = TRUE;
     struct view *view = display[current_view];
-    enum line_type type;
     if (!empty || *msg) {
         va_list args;
 
