@@ -139,6 +139,9 @@ struct view {
 	void **line;		/* Line index */
     const char *cmd;
 
+    /* filename */
+    char file[BUFSIZ];
+
 	/* Loading */
 	FILE *pipe;
 };
@@ -417,13 +420,17 @@ static void init(void)
 
 static void update_title_win(struct view *view)
 {
+    size_t len;
     if (view == display[current_view])
         wbkgdset(view->title, get_line_attr(LINE_TITLE_FOCUS));
 
     werase(view->title);
     wmove(view->title, 0, 0);
-    wprintw(view->title, "[filename]");
-    wmove(view->title, 0, 12);
+    wprintw(view->title, "[RPathN]");
+    wmove(view->title, 0, 9);
+    waddstr(view->title, view->file);
+    len = strlen(view->file); 
+    wmove(view->title, 0, len + 13);
 
     if (view->lines) { 
         wprintw(view->title, "line %d of %d (%d%%)",
@@ -694,6 +701,7 @@ static bool default_render(struct view *view, unsigned int lineno)
 		type = LINE_CURSOR;
 		wattrset(view->win, get_line_attr(type));
 		wchgat(view->win, -1, 0, type, NULL);
+        string_copy(view->file, fileinfo->name);
 
 	} else {
 		type = LINE_FILE_LINCON;
