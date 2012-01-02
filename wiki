@@ -1,3 +1,18 @@
+# ACK is also very powerful
+
+it basically does whatever I want for my xxx
+
+    sudo apt-get install ack-grep
+    sudo ln -s /usr/bin/ack-grep /usr/bin/ack
+
+    then in vim
+
+        :Ack xxx
+
+    or maybe have this in .vimrc
+
+        map ,k :Ack <cword><ENTER>
+
 #BUG:
  
   xxx "word word" 
