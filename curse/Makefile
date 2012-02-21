@@ -1,6 +1,6 @@
 all:
-	gcc xxx.c -o xxx -lncursesw -g -Wall
+	gcc xxx.c -o xxx -lncursesw  -Wall
 
 install:
-	mv xxx /bin
+	mv xxx /home/peter/bin
 	

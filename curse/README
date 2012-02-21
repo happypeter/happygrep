@@ -1,6 +1,7 @@
 first install these packages:
 
     sudo apt-get install libncurses5 libncurses5-dev 
+    sudo apt-get install libncursesw5 libncursesw5-dev 
 
 Next:
 
