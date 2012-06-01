@@ -108,12 +108,27 @@ get_request(int key)
 /*
  * String helpers
  */
+
 static inline void
 string_ncopy(char *dst, const char *src, int dstlen)
 {
 	strncpy(dst, src, dstlen - 1);
 	dst[dstlen - 1] = 0;
 
+}
+
+char* strcat1(char *dest, const char *src)
+{
+    size_t i;
+    size_t src_len = strlen(src);
+
+    dest[0] = '\"';
+    for (i = 0 ; src[i] != '\0' ; i++)
+        dest[i+1] = src[i];
+    dest[src_len + 1] = '\"';
+    dest[src_len + 2] = '\0';
+
+    return dest;
 }
 
 /* Shorthand for safely copying into a fixed buffer. */
@@ -239,15 +254,33 @@ int main(int argc, char *argv[])
     request = REQ_VIEW_MAIN; 
     struct view *view;
 
+    size_t argv1_len;
+    size_t argv2_len;
+    size_t size;
+
     if (argc < 2) {
         printf("Usage: %s <dir/filename> <keyword>\n", argv[0]);
         return 0;
     }
+    
+    argv1_len = strlen(argv[1]);
+    size = argv1_len + 3;
+
+    char dest1[size];
+    strcat1(dest1, argv[1]);
+
     if (argc == 3) {
-        snprintf(buf, sizeof(buf), FIND_CMDD, argv[1], argv[2]);
+        argv2_len = strlen(argv[2]);
+        size = argv2_len + 3;
+
+        char dest2[size];
+        strcat1(dest2, argv[2]);
+
+        snprintf(buf, sizeof(buf), FIND_CMDD, dest2, dest1);
         string_copy(fmt_cmd, buf);
+
     }else{
-        snprintf(buf, sizeof(buf), FIND_CMD, argv[1]);
+        snprintf(buf, sizeof(buf), FIND_CMD, dest1);
         string_copy(fmt_cmd, buf);
     }
 
