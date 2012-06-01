@@ -117,6 +117,11 @@ string_ncopy(char *dst, const char *src, int dstlen)
 
 }
 
+/* Shorthand for safely copying into a fixed buffer. */
+#define string_copy(dst, src) \
+	string_ncopy(dst, src, sizeof(dst))
+
+/*add double quote to arguments passed by command line*/
 char* strcat1(char *dest, const char *src)
 {
     size_t i;
@@ -130,10 +135,6 @@ char* strcat1(char *dest, const char *src)
 
     return dest;
 }
-
-/* Shorthand for safely copying into a fixed buffer. */
-#define string_copy(dst, src) \
-	string_ncopy(dst, src, sizeof(dst))
 
 struct view {
 	const char *name;
