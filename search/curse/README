@@ -1,0 +1,38 @@
+first install these packages:
+
+    sudo apt-get install libncurses5 libncurses5-dev 
+    sudo apt-get install libncursesw5 libncursesw5-dev 
+
+Next:
+
+    make
+    sudo make install
+
+BUG:
+    when using chinese version ubuntu
+    if you have binary file in working dir
+    xxx will end with segfault. 
+
+    Now the bug above is fixed. You don't need to delete the binary file. 
+
+
+Now, it can display Chinese. Just use the shared library libncursesw.so.5, not
+libncurses.so.5, so you need run the command below to compile the programme.
+
+    gcc xxx.c -o xxx -lncursesw 
+
+If there is no libncursesw.so.5 in your OS, you should install it first.
+
+    sudo apt-get install libncursesw5-dev
+
+MAC:
+
+    since I do not know how to install dev headers for ncurses on mac, so I stupidly copied the 
+
+        ncurses.h
+
+    from a linux machine, and then use
+
+        gcc -I.
+
+    it sucks.
