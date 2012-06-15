@@ -17,7 +17,7 @@ it basically does whatever I want for my xxx
  
   xxx "word word" 
 
-does not suport string with space in
+does suport string with space in, the bug was fixed.
 
 ## ncurses
 

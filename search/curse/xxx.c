@@ -20,8 +20,9 @@ static void report(const char *msg, ...);
 static void init_colors(void);
 static void init(void);
 
-// annoying is the "\\" escape sign, why double? C string needs one for "\" and
-// bash needs another for "(", "!" and ")"
+/* annoying is the "\\" escape sign, why double? C string needs one for "\" and
+ bash needs another for "(", "!" and ")". */
+ 
 #define FIND_CMD \
 "find . -name .git -prune -o \\( \\! -name *.swp \\) -exec grep -in %s {} +"
 #define FIND_CMDD \
