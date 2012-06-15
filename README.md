@@ -70,15 +70,15 @@ Also, you can ignore a directory named "image":
 After running the commands above respectively, then you will get a nice window based
 text user interface. 
 
-    * use up/down arrow to select the entry listed in window
+* use up/down arrow to select the entry listed in window
 
-    * type `e` character to open the file where the proper entry appeared.
+* type `e` character to open the file where the proper entry appeared.
 
-    * edit the opened file in `vim` editor
+* edit the opened file in `vim` editor
 
-    * close `vim` to return to original window to continue
+* close `vim` to return to original window to continue
 
-    * type `q` character to quit 
+* type `q` character to quit 
 
 ### Development
 
@@ -91,7 +91,7 @@ tracker](https://github.com/happypeter/happygrep/issues).
 
 ### Contributors 
 
-* [happypeter (author)(https://github.com/happypeter)
+* [happypeter (author)](https://github.com/happypeter)
 
 * [billie66](https://github.com/billie66)
 
