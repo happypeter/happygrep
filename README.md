@@ -72,11 +72,11 @@ text user interface.
 
 * use up/down arrow to select the entry listed in window
 
-* type `e` character to open the file where the proper entry appeared.
+* type `e` character to open the file where the proper entry appeared
 
 * edit the opened file in `vim` editor
 
-* close `vim` to return to original window to continue
+* close `vim` to return to the original window to continue
 
 * type `q` character to quit 
 
