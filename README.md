@@ -23,16 +23,16 @@ Up to this point, I didn't give other platforms a try.
 This will get you going with the latest version of `happygrep` and make it
 easy to fork and contribute any changes back upstream.
 
-1. Check out `happygrep` into `~/happygrep`.
+* Check out `happygrep` into `~/happygrep`.
 
-        $ cd
-        $ git clone git://github.com/happygrep/happygrep.git 
+    $ cd
+    $ git clone git://github.com/happygrep/happygrep.git 
 
-2. Then go to `~/happygrep/search/curse/` directory, compire and install it.
+* Then go to `~/happygrep/search/curse/` directory, compire and install it.
 
-        $ cd ~/happypeter/search/curse/
-        $ make
-        $ sudo make install
+    $ cd ~/happypeter/search/curse/
+    $ make
+    $ sudo make install
          
 Note After compiling `happygrep`, you will get an executable file called `xxx`
 that will be installed in `~/bin` directory, the default search path in
