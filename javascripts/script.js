@@ -47,6 +47,6 @@ $(document).ready(function(){
   $(".current-section a").click(function(){
     $(window).scrollTop(0);
     return false;
-  })
+  });
 });
 })(jQuery)
