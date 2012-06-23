@@ -1,20 +1,3 @@
-## install
-
-Firstly, install dependencies:
-
-    sudo apt-get install libncurses5 libncurses5-dev
-
-now compile:
-
-    gcc -o xxx xxx.c -lncurses
-
-finally copy the binary `xxx` to once of the $PATH places
-
-   cp xxx ~/bin/
-
-NOTE: the $HOME/bin is a nice place to install your own made app, since no `sudo` is needed
-and on ubuntu, you don't need to modify $PATH to make it work, it is just one of the defaults.
-
 ## dev note
 
 If you've configured your ncurses with --enable-sigwinch, then you can go the 

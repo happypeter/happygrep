@@ -1,6 +1,6 @@
 all:
-	gcc xxx.c -o xxx -lncursesw  -Wall
+	gcc happygrep.c -o happygrep -lncursesw  -Wall
 
 install:
-	mv xxx ~/bin
+	mv happygrep /bin
 	
