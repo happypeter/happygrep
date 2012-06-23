@@ -380,9 +380,11 @@ footer .owner p a {
 }
 
 .markdown-body pre {
-  padding: 10px 70px 10px 0;
-  margin-left: -20px;
-  margin-right: -20px;
+  padding: 10px 70px 10px 10px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  margin-left: 20px;
+  margin-right: 20px;
   font-family: 'Monaco', 'Lucida Console', monospace;
   font-size: 13px;
   line-height: 20px;
@@ -392,18 +394,16 @@ footer .owner p a {
   color: #d6d6d6;
 }
 
-.markdown-body pre.lines {
-  font-size: 12px;
-  margin:0 10px 0 -20px;
-  padding: 10px;
-  float:  left;
-  display: block;
-  text-align: right;
-  box-shadow: none;
-  background-color:#2a2a2a;
+code {
+  background-color:#3b3b3b;
   color: #d6d6d6;
+  margin: 0 2px;
+  padding: 0 5px;
 }
-
+pre code {
+  margin: 0;
+  padding: 0;
+}
 .markdown-body ul,
 .markdown-body ol {
   padding-left: 30px;
@@ -420,43 +420,6 @@ footer .owner p a {
   margin-bottom: 10px;
 }
 
-.markdown-body li pre,
-.markdown-body li pre.lines,
-.markdown-body dd pre,
-.markdown-body dd pre.lines {
-  margin-left: -35px;
-}
-
-.markdown-body dt {
-  font-weight: bold;
-  font-style: italic;
-}
-
-.markdown-body dd {
-  margin-left: 15px;
-}
-
-.markdown-body table {
-  width: 673px;
-  margin-left: -20px;
-  margin-right: -20px;
-}
-
-.markdown-body tbody {
-  border-top: 2px solid #557398;
-  border-bottom: 2px solid #557398;
-  background-color: #EBEFF4;
-}
-
-.markdown-body table td * {
-  margin: 0;
-}
-
-.markdown-body td {
-  border-right: 1px solid #557398;
-  border-bottom: 1px solid #557398;
-  padding: 5px;
-}
 
 .markdown-body td:first-child,
 .markdown-body th:first-child {
