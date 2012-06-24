@@ -16,61 +16,40 @@ install the library firstly, otherwise it can't be compiled successfully :
     
     sudo apt-get install libncursesw5 libncursesw5-dev 
 
-Up to this point, I didn't give other platforms a try.
-
 #### Basic GitHub Checkout
 
 This will get you going with the latest version of `happygrep` and make it
 easy to fork and contribute any changes back upstream.
 
-1. Check out `happygrep` into `~/happygrep`.
+1. Check out the code
 
-        $ cd
         $ git clone git://github.com/happygrep/happygrep.git 
 
-2. Then go to `~/happygrep/search/curse/` directory, compile and install it.
+2. Then compile and install it.
 
-        $ cd ~/happypeter/search/curse/
+        $ cd ~/happypeter/
         $ make
         $ sudo make install
          
-Note After compiling `happygrep`, you will get an executable file called `xxx`
-that will be installed in `~/bin` directory, the default search path in
-unbuntu, so it is not necessary to add `~/bin` to `PATH` environment
-variable.  
-
-### Upgrading
-
-If you've installed `happygrep` using the instructions above, you can
-upgrade your installation at any time using git.
-
-To upgrade to the latest development version of `happygrep`, use `git pull`:
-
-    $ cd ~/happygrep
-    $ git pull
-
 ### Usage
 
-The small application has limited usages, just two forms, so in order to
-improve it, there are many work needed to do. By default, it will skip the 
-`.git` directory when you search a `git` repository, and it does support
-regular expression, since the search task is done by `grep` command. In
-addition, `happygrep` can specify one directory to ignore. The directory name
-can use regex. 
+By default, happygrep skips the `.git` directory, and it supports regular
+expression, it is `grep` Anyway. In addition, `happygrep` can specify one
+directory to ignore. The directory name can use regex. 
 
 For instance, we want to search the string `hello world` in a git` repository called
 `techdoc`, we can do like this:
 
-    xxx "hello world"
+    happygrep "hello world"
 
-Also, you can ignore a directory named "image":
+Also, you can ignore a directory named `image/`:
 
-    xxx "hello world" "image"
+    happygrep "hello world" "image"
 
 After running the commands above respectively, then you will get a nice window based
 text user interface. 
 
-* use up/down arrow to select the entry listed in window
+* use `j` and `k` (or up/down arrows) to select the entry listed in window
 
 * type `e` character to open the file where the proper entry appeared
 
@@ -81,10 +60,6 @@ text user interface.
 * type `q` character to quit 
 
 ### Development
-
-The `happygrep`source code is [hosted on
-GitHub](https://github.com/happypeter/happygrep). It's clean and easy
-to understand, even if you're not a C hacker.
 
 Please feel free to submit pull requests and file bugs on the [issue
 tracker](https://github.com/happypeter/happygrep/issues).
