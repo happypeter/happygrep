@@ -1,7 +1,7 @@
 ## Simple and nice grep front-end: happygrep 
 
-While `grep` is a powerful command line tool, its syntax is difficult and its
-output is ugly. So for the convenient of human being, we need a more smart
+While `grep` is a powerful command line tool, it is difficult to use
+So for the convenient of human being, we need a more smart
 tool to do our work. 
 
 `happygrep` is a small and nice `grep` front-end based on `ncursesw` __TUI__. 
