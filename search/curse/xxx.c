@@ -26,7 +26,7 @@ static void init(void);
 #define FIND_CMD \
 "find . -name .git -prune -o \\( \\! -name *.swp \\) -exec grep -in %s {} +"
 #define FIND_CMDD \
-"find . -name %s -prune -o \\( \\! -name *.swp \\) -exec grep -in %s {} +"
+"find . -name .git -prune -o -name %s -prune -o \\( \\! -name *.swp \\) -exec grep -in %s {} +"
 
 #define COLOR_DEFAULT  (-1)
 
