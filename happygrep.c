@@ -122,7 +122,7 @@ string_ncopy(char *dst, const char *src, int dstlen)
 #define string_copy(dst, src) \
 	string_ncopy(dst, src, sizeof(dst))
 
-/*add double quote to arguments passed by command line*/
+/*add double quotes to arguments passed by command line*/
 char* strcat1(char *dest, const char *src)
 {
     size_t i;
@@ -235,36 +235,40 @@ static struct line_info line_info[] = {
 #undef  LINE
 };
 
-static void redraw_display(bool clear)
+static const char usage[] =
+"Usage: happygrep PATTERN        \n"
+"   or: happygrep [option] \n"
+"   or: happygrep PATTERN [option1] DIR/FILE\n"
+"\n"
+"Search for PATTERN in current directory, but ignore .git directory by default.\n"
+"PATTERN by default is a basic regex.\n"
+"Specify DIR/FILE to be ignored in current directory.\n"
+"DIR/FILE (a directory or a file) is also a basic regex.\n"
+"\n"
+"Examples: happygrep 'hello world'\n"
+"      or: happygrep 'hello$' -i 'main.c'\n"
+"\n"
+"Option:\n"
+"  -h, --help      Show help message and exit"
+"\n"
+"Option1:\n"
+"  -i, --ignore    ignore a dir or file";
+
+int parse_options(int argc, const char *argv[])
 {
-    struct view *view;
-    view = display[0];
-
-    if (clear)
-        wclear(view->win);
-    redraw_view(view);
-    update_title_win(view);
-}
-
-int main(int argc, char *argv[])
-{
-	const char *codeset = "UTF-8";
-    /* c must be int not char, because the value of KEY_RESIZE is 632. */
-    int c;
-    char buf[BUFSIZ];
-    enum request request; 
-    request = REQ_VIEW_MAIN; 
-    struct view *view;
-
     size_t argv1_len;
     size_t argv2_len;
     size_t size;
+    char buf[BUFSIZ];
+    const char *subcommand;
 
-    if (argc < 2) {
-        printf("Usage: %s <dir/filename> <keyword>\n", argv[0]);
-        return 0;
+    if (argc <= 1) {
+        printf("%s\n", usage);
+        exit(1); 
     }
     
+    subcommand = argv[1];
+
     argv1_len = strlen(argv[1]);
     size = argv1_len + 3;
 
@@ -285,6 +289,19 @@ int main(int argc, char *argv[])
         snprintf(buf, sizeof(buf), FIND_CMD, dest1);
         string_copy(fmt_cmd, buf);
     }
+    return 0;
+}
+
+int main(int argc, const char *argv[])
+{
+	const char *codeset = "UTF-8";
+    /* c must be int not char, because the maximum value of KEY_RESIZE is 632. */
+    int c;
+    enum request request; 
+    request = REQ_VIEW_MAIN; 
+    struct view *view; 
+
+    parse_options(argc, argv);
 
     signal(SIGINT, quit);
 
@@ -511,6 +528,17 @@ static void resize_display(void)
     }
 }
 
+static void redraw_display(bool clear)
+{
+    struct view *view;
+    view = display[0];
+
+    if (clear)
+        wclear(view->win);
+    redraw_view(view);
+    update_title_win(view);
+}
+
 static int update_view(struct view *view)
 {
 	char buffer[BUFSIZ];
@@ -635,6 +663,7 @@ static int strlength(const char *term)
     length = i;
     return length;
 }
+
 /* when a file name containing blankspace, vim will consider 
  * it as more than one file, in order to fix this problem, 
  * so the function below renames the filename using '\ ' 
