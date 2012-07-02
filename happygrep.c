@@ -237,8 +237,7 @@ static struct line_info line_info[] = {
 
 static const char usage[] =
 "Usage: happygrep PATTERN        \n"
-"   or: happygrep [option] \n"
-"   or: happygrep PATTERN [option1] DIR/FILE\n"
+"   or: happygrep PATTERN [option] DIR/FILE\n"
 "\n"
 "Search for PATTERN in current directory, but ignore .git directory by default.\n"
 "PATTERN by default is a basic regex.\n"
@@ -249,9 +248,6 @@ static const char usage[] =
 "      or: happygrep 'hello$' -i 'main.c'\n"
 "\n"
 "Option:\n"
-"  -h, --help      Show help message and exit"
-"\n"
-"Option1:\n"
 "  -i, --ignore    ignore a dir or file";
 
 int parse_options(int argc, const char *argv[])
@@ -260,27 +256,25 @@ int parse_options(int argc, const char *argv[])
     size_t argv2_len;
     size_t size;
     char buf[BUFSIZ];
-    const char *subcommand;
 
-    if (argc <= 1) {
+    if (argc <= 1 || argc == 3) {
+        printf("happygrep: invalid number of arguments.\n");
         printf("%s\n", usage);
         exit(1); 
     }
     
-    subcommand = argv[1];
-
     argv1_len = strlen(argv[1]);
     size = argv1_len + 3;
 
     char dest1[size];
     strcat1(dest1, argv[1]);
 
-    if (argc == 3) {
-        argv2_len = strlen(argv[2]);
+    if (argc == 4 && (!strcmp(argv[2], "-i") || !strcmp(argv[2], "--ignore"))) {
+        argv2_len = strlen(argv[3]);
         size = argv2_len + 3;
 
         char dest2[size];
-        strcat1(dest2, argv[2]);
+        strcat1(dest2, argv[3]);
 
         snprintf(buf, sizeof(buf), FIND_CMDD, dest2, dest1);
         string_copy(fmt_cmd, buf);
