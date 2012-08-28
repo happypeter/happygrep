@@ -127,7 +127,7 @@ string_ncopy(char *dst, const char *src, int dstlen)
  *for example, grep '\\' test 
  *to find lines containing backslashes in the file named test.
  *If use double quotes, the command above will probably evaluate not run.
- */
+ **/
 
 char* strcat1(char *dest, const char *src)
 {
@@ -139,11 +139,17 @@ char* strcat1(char *dest, const char *src)
     for (i = 0 ; src[i] != '\0' ; i++) {
         if (src[0] == '-') {
             dest[1] = '\\';
-            dest[i+2] = src[i];
+            dest[i + 2] = src[i];
+        }
+        else if (src[i] == '/') {
+            dest[i + 1] = '\'';
+            dest[i + 2] = '\0';
+            return dest;
         }
         else
-            dest[i+1] = src[i];
+            dest[i + 1] = src[i];
     }
+
     if (src[0] == '-') {
         dest[src_len + 2] = '\'';
         dest[src_len + 3] = '\0';
