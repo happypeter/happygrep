@@ -119,20 +119,39 @@ string_ncopy(char *dst, const char *src, int dstlen)
 }
 
 /* Shorthand for safely copying into a fixed buffer. */
+
 #define string_copy(dst, src) \
 	string_ncopy(dst, src, sizeof(dst))
 
-/*add double quotes to arguments passed by command line*/
+/*add single quotes to arguments passed by command line,
+ *for example, grep '\\' test 
+ *to find lines containing backslashes in the file named test.
+ *If use double quotes, the command above will probably evaluate not run.
+ */
+
 char* strcat1(char *dest, const char *src)
 {
     size_t i;
     size_t src_len = strlen(src);
 
-    dest[0] = '\"';
-    for (i = 0 ; src[i] != '\0' ; i++)
-        dest[i+1] = src[i];
-    dest[src_len + 1] = '\"';
-    dest[src_len + 2] = '\0';
+    dest[0] = '\'';
+
+    for (i = 0 ; src[i] != '\0' ; i++) {
+        if (src[0] == '-') {
+            dest[1] = '\\';
+            dest[i+2] = src[i];
+        }
+        else
+            dest[i+1] = src[i];
+    }
+    if (src[0] == '-') {
+        dest[src_len + 2] = '\'';
+        dest[src_len + 3] = '\0';
+    }
+    else {
+        dest[src_len + 1] = '\'';
+        dest[src_len + 2] = '\0';
+    }
 
     return dest;
 }
@@ -257,16 +276,17 @@ int parse_options(int argc, const char *argv[])
     size_t size;
     char buf[BUFSIZ];
 
-    if (argc <= 1 || argc == 3) {
-        printf("happygrep: invalid number of arguments.\n");
+    if (argc <= 1 || argc == 3 || argc >4) {
+        printf("happygrep: invalid number of arguments.\n\n");
         printf("%s\n", usage);
         exit(1); 
     }
     
     argv1_len = strlen(argv[1]);
-    size = argv1_len + 3;
+    size = argv1_len + 4;
 
     char dest1[size];
+
     strcat1(dest1, argv[1]);
 
     if (argc == 4 && (!strcmp(argv[2], "-i") || !strcmp(argv[2], "--ignore"))) {

@@ -34,7 +34,7 @@ easy to fork and contribute any changes back upstream.
 ### Usage
 
 By default, happygrep skips the `.git` directory, and it supports regular
-expression, it is `grep` Anyway. In addition, `happygrep` can specify one
+expression, it is `grep` anyway. In addition, `happygrep` can specify one
 directory to ignore. The directory name can use regex. 
 
 For instance, we want to search the string `hello world` in a git` repository called
@@ -44,7 +44,7 @@ For instance, we want to search the string `hello world` in a git` repository ca
 
 Also, you can ignore a directory named `image/`:
 
-    happygrep "hello world" "image"
+    happygrep "hello world" -i "image"
 
 After running the commands above respectively, then you will get a nice window based
 text user interface. 
