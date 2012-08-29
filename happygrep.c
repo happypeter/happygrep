@@ -29,7 +29,8 @@ static void init(void);
 #define FIND_CMDD \
 "find . \\( -name '.?*' -o -name %s -o -name tags \\) -prune -o -exec grep -in %s {} +"
 
-#define VIM_CMD  "vim + %s %s"
+/* There must be no space between + and %s.*/
+#define VIM_CMD  "vim +%s %s"
 
 #define VERSION  "happygrep v1.0" 
 
