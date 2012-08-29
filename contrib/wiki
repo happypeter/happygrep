@@ -5,15 +5,15 @@ it basically does whatever I want for my xxx
     sudo apt-get install ack-grep
     sudo ln -s /usr/bin/ack-grep /usr/bin/ack
 
-    then in vim
+then in vim
 
-        :Ack xxx
+    :Ack xxx
 
-    or maybe have this in .vimrc
+or maybe have this in .vimrc
 
-        map ,k :Ack <cword><ENTER>
+    map ,k :Ack <cword><ENTER>
 
-#BUG:
+# BUG:
  
   xxx "word word" 
 
@@ -27,7 +27,6 @@ you can get ncurses api doc by moving your cursor on it and K (open man page) in
 
     .     matches any character
     .*    matches any set of characters
-
 
 [0-9a-f][0-9a-f] : two hex bit
 
@@ -53,13 +52,10 @@ find a word, case ignored
 ## use color in bash
 
 http://webhome.csc.uvic.ca/~sae/seng265/fall04/tips/s265s047-tips/bash-using-colors.html
+
 ## how to install search.vim
 
-
-
 find . -exec grep "$1" '{}' \; -print|vim -s /usr/share/vim/vim72/syntax/search.vim -
-
-
 
 # echo "text for vim" |vim -
 # read from stdout
@@ -70,7 +66,6 @@ find . -exec grep "$1" '{}' \; -print|vim -s /usr/share/vim/vim72/syntax/search.
 #    find . |grep -v .git| xargs grep -in tig
 #
 #
-
 
 ## dev note
 
@@ -123,3 +118,8 @@ MAC:
         gcc -I.
 
     it sucks.
+
+### exclude multiple directories from find command
+
+    find . -type d \( -name dir -o -name dir1 -o -name dir2 \) -prune -o -print
+

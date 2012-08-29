@@ -24,16 +24,17 @@ static void init(void);
  bash needs another for "(", "!" and ")". */
  
 #define FIND_CMD \
-"find . -name .git -prune -o \\( \\! -name *.swp \\) -exec grep -in %s {} +"
+"find . \\( -name '.?*' -o -name tags \\) -prune -o -exec grep -in %s {} +"
+
 #define FIND_CMDD \
-"find . -name .git -prune -o -name %s -prune -o \\( \\! -name *.swp \\) -exec grep -in %s {} +"
+"find . \\( -name '.?*' -o -name %s -o -name tags \\) -prune -o -exec grep -in %s {} +"
 
 #define COLOR_DEFAULT  (-1)
 
-#define ABS(x) ((x) >=0 ? (x) : -(x))
+#define ABS(x) ((x) >= 0 ? (x) : -(x))
 #define MIN(x) ((x) <= (y) ? (x) : (y))
 #define ARRAY_SIZE(x)   (sizeof(x) / sizeof(x[0]))
-#define VIM_CMD  "vim +%s %s"
+#define VIM_CMD  "vim + %s %s"
 
 #define SIZEOF_STR	1024	/* Default string size. */
 
@@ -42,7 +43,7 @@ static void init(void);
 #define ICONV_CONST	/* nothing */
 #endif
 
-static char opt_encoding[20]		= "UTF-8";
+static char opt_encoding[20] = "UTF-8";
 static iconv_t opt_iconv_in	= ICONV_NONE;
 static iconv_t opt_iconv_out = ICONV_NONE;
 
