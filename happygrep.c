@@ -29,22 +29,26 @@ static void init(void);
 #define FIND_CMDD \
 "find . \\( -name '.?*' -o -name %s -o -name tags \\) -prune -o -exec grep -in %s {} +"
 
+#define VIM_CMD  "vim + %s %s"
+
+#define VERSION  "happygrep v1.0" 
+
 #define COLOR_DEFAULT  (-1)
 
 #define ABS(x) ((x) >= 0 ? (x) : -(x))
 #define MIN(x) ((x) <= (y) ? (x) : (y))
 #define ARRAY_SIZE(x)   (sizeof(x) / sizeof(x[0]))
-#define VIM_CMD  "vim + %s %s"
 
 #define SIZEOF_STR	1024	/* Default string size. */
 
 #define ICONV_NONE	((iconv_t) -1)
+
 #ifndef ICONV_CONST
 #define ICONV_CONST	/* nothing */
 #endif
 
 static char opt_encoding[20] = "UTF-8";
-static iconv_t opt_iconv_in	= ICONV_NONE;
+static iconv_t opt_iconv_in = ICONV_NONE;
 static iconv_t opt_iconv_out = ICONV_NONE;
 
 static int opt_tab_size = 8;
@@ -262,19 +266,22 @@ static struct line_info line_info[] = {
 };
 
 static const char usage[] =
-"Usage: happygrep PATTERN        \n"
-"   or: happygrep PATTERN [option] DIR/FILE\n"
+"Usage: happygrep [option1] PATTERN\n"
+"   or: happygrep PATTERN [option2] DIR|FILE\n"
 "\n"
-"Search for PATTERN in current directory, but ignore .git directory by default.\n"
-"PATTERN by default is a basic regex.\n"
-"Specify DIR/FILE to be ignored in current directory.\n"
-"DIR/FILE (a directory or a file) is also a basic regex.\n"
+"Search for PATTERN in the current directory, by default exclude all the hidden \
+files and the file named tags. PATTERN can support the basic regex. \
+When use option2 switch, you can specify a DIR|FILE to be ignored.\n"
+"\n"
+"Option1:\n"
+"  --help          This help\n"
+"  --version       Display version & copyright\n"
+"\n"
+"Option2:\n"
+"  -i, --ignore    Ignore a dir or file\n"
 "\n"
 "Examples: happygrep 'hello world'\n"
-"      or: happygrep 'hello$' -i 'main.c'\n"
-"\n"
-"Option:\n"
-"  -i, --ignore    ignore a dir or file";
+"      or: happygrep 'hello$' -i 'main.c'\n";
 
 int parse_options(int argc, const char *argv[])
 {
@@ -285,18 +292,35 @@ int parse_options(int argc, const char *argv[])
 
     if (argc <= 1 || argc == 3 || argc >4) {
         printf("happygrep: invalid number of arguments.\n\n");
-        printf("%s\n", usage);
         exit(1); 
+    } 
+
+    if (argc == 2) {
+        if (!strcmp(argv[1], "--help")) {
+            printf("%s\n", usage);
+            exit(1);
+        } else if (!strcmp(argv[1], "--version")) {
+            printf("%s\n", VERSION);
+            exit(1);
+        } else {
+            argv1_len = strlen(argv[1]);
+            size = argv1_len + 4;
+
+            char dest1[size];
+            strcat1(dest1, argv[1]);
+
+            snprintf(buf, sizeof(buf), FIND_CMD, dest1);
+            string_copy(fmt_cmd, buf);
+        }
     }
-    
-    argv1_len = strlen(argv[1]);
-    size = argv1_len + 4;
-
-    char dest1[size];
-
-    strcat1(dest1, argv[1]);
 
     if (argc == 4 && (!strcmp(argv[2], "-i") || !strcmp(argv[2], "--ignore"))) {
+        argv1_len = strlen(argv[1]);
+        size = argv1_len + 4;
+
+        char dest1[size];
+        strcat1(dest1, argv[1]);
+
         argv2_len = strlen(argv[3]);
         size = argv2_len + 3;
 
@@ -305,11 +329,8 @@ int parse_options(int argc, const char *argv[])
 
         snprintf(buf, sizeof(buf), FIND_CMDD, dest2, dest1);
         string_copy(fmt_cmd, buf);
-
-    }else{
-        snprintf(buf, sizeof(buf), FIND_CMD, dest1);
-        string_copy(fmt_cmd, buf);
     }
+
     return 0;
 }
 
