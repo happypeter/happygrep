@@ -1,0 +1,10 @@
+#
+# Dependencies: brew install ncurses; brew install libiconv
+#
+
+all:
+	gcc happygrep.c  -I/usr/local/opt/libiconv/include -I/usr/local/opt/ncurses/include -L/usr/local/opt/libiconv/lib -L/usr/local/opt/ncurses/lib -o happygrep -lncursesw  -liconv -Wall 
+
+install:
+	cp happygrep ~/bin
+	

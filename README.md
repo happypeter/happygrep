@@ -16,6 +16,17 @@ install the library firstly, otherwise it can't be compiled successfully :
 
     sudo apt-get -y install libncursesw5 libncursesw5-dev
 
+### Installation (Mac OS X)
+First, install Brew package manager. Then run the following commands in Terminal.
+
+	```bash
+	brew install ncurses
+	brew install libiconv
+	make -f Makefile.macosx
+	make -f Makefile.macosx install
+	```
+Note: the executable file is installed in ~/bin folder.
+
 #### Basic GitHub Checkout
 
 This will get you going with the latest version of `happygrep` and make it

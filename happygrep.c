@@ -93,8 +93,11 @@ static struct keymap keymap[] = {
 
     { 'k',      REQ_MOVE_UP },
     { 'j',      REQ_MOVE_DOWN },
+    { KEY_UP,      REQ_MOVE_UP },
+    { KEY_DOWN,      REQ_MOVE_DOWN },
 
     { 'e',      REQ_OPEN_VIM},
+    { KEY_RIGHT,      REQ_OPEN_VIM},
 
     /* Use the ncurses SIGWINCH handler. */
     { KEY_RESIZE,   REQ_SCREEN_RESIZE },
