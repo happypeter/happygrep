@@ -33,7 +33,7 @@ easy to fork and contribute any changes back upstream.
 
 1. Check out the code
 
-        $ git clone git://github.com/happygrep/happygrep.git
+        $ git clone git://github.com/happypeter/happygrep.git
 
 2. Then compile and install it.
 
