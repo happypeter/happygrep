@@ -19,27 +19,26 @@ install the library firstly, otherwise it can't be compiled successfully :
 ### Installation (Mac OS X)
 First, install Brew package manager. Then run the following commands in Terminal.
 
-	 brew install ncurses
-	 brew install libiconv
-	 make -f Makefile.macosx
-	 make -f Makefile.macosx install
+在我自己的 10.8.5 系统上
 
-Note: the executable file is installed in ~/bin folder.
+    $ brew --version
+    0.9.5
+    $ brew search ncurses
+    homebrew/dupes/ncurses
+    $ brew install homebrew/dupes/ncurses
+    $ make -f Makefile.macosx
 
-#### Basic GitHub Checkout
+libiconv 在 10.8.5
+的系统上已经预装了，但是较老的系统上好像没有，所以在老版本的 mac
+上，我自己安装的过程是：
 
-This will get you going with the latest version of `happygrep` and make it
-easy to fork and contribute any changes back upstream.
+    $ brew install ncurses
+    $ brew install libiconv
+    $ make -f Makefile.macosx
 
-1. Check out the code
+并且老版本的 Makefile.macosx 中的编译语句是这样的：
 
-        $ git clone git://github.com/happypeter/happygrep.git
-
-2. Then compile and install it.
-
-        $ cd ~/happypeter/
-        $ make
-        $ sudo make install
+    gcc happygrep.c  -I/usr/local/opt/libiconv/include -I/usr/local/opt/ncurses/include -L/usr/local/opt/libiconv/lib -L/usr/local/opt/ncurses/lib -o happygrep -lncursesw  -liconv -Wall
 
 ### Usage
 
