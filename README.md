@@ -17,7 +17,6 @@ install the library firstly, otherwise it can't be compiled successfully :
     sudo apt-get -y install libncursesw5 libncursesw5-dev
 
 ### Installation (Mac OS X)
-First, install Brew package manager. Then run the following commands in Terminal.
 
 在我自己的 10.8.5 系统上
 
@@ -28,7 +27,7 @@ First, install Brew package manager. Then run the following commands in Terminal
     $ brew install homebrew/dupes/ncurses
     $ make -f Makefile.macosx
 
-libiconv 在 10.8.5
+这样就装好了。libiconv 在 10.8.5
 的系统上已经预装了，但是较老的系统上好像没有，所以在老版本的 mac
 上，我自己安装的过程是：
 
