@@ -1,6 +1,7 @@
 ## Simple and nice grep front-end: happygrep
 
-happygrep is a grep TUI front-end based on ncursesw.
+happygrep 采用 ncursesw 的 TUI 字符界面图形库，相当于 find + grep + 前端界面。
+
 
 ### Installation (Ubuntu)
 
@@ -43,21 +44,15 @@ happygrep is a grep TUI front-end based on ncursesw.
 
 ### Usage
 
-By default, happygrep skips the `.git` directory, and it supports regular
-expression, it is `grep` anyway. In addition, `happygrep` can specify one
-directory to ignore. The directory name can use regex.
-
-For instance, we want to search the string `hello world` in a git` repository called
-`techdoc`, we can do like this:
-
-    happygrep "hello world"
-
-Also, you can ignore a directory named `image/`:
+happygrep 会默认忽略 `.git` 目录. 另外也可以通过 -i 参数指定另一个要忽略的目录，例如
 
     happygrep "hello world" -i "image"
 
-After running the commands above respectively, then you will get a nice window based
-text user interface.
+这样可以忽略 image/ 目录。
+
+
+在打开的 TUI 界面上，可以使用的快捷键
+
 
 * use `j` and `k` (or up/down arrows) to select the entry listed in window
 
@@ -71,18 +66,17 @@ text user interface.
 
 ### Development
 
-Please feel free to submit pull requests and file bugs on the [issue
+有任何的问题和建议，欢迎到 [issue
 tracker](https://github.com/happypeter/happygrep/issues).
 
 ### Contributors
 
-* [happypeter (author)](https://github.com/happypeter)
+* [happypeter (原作者)](https://github.com/happypeter)
 
-* [billie66](https://github.com/billie66)
+* [billie66 (当前代码的最大贡献者)](https://github.com/billie66)
+* 
 
 ### License
 
-(The MIT license)
-
-Copyright (c) 2011 happypeter
+The MIT license
 
