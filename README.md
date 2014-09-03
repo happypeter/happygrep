@@ -1,13 +1,10 @@
 ## Simple and nice grep front-end: happygrep
 
-grep is a powerful command line tool, it is difficult to use.
-
 happygrep is a grep TUI front-end based on ncursesw.
 
 ### Installation (Ubuntu)
 
-happygrep dependends on ncursesw library, so we need to
-install the library first
+需要先安装依赖库
 
     sudo apt-get -y install libncursesw5 libncursesw5-dev
     cd happygrep/
