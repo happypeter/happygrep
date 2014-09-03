@@ -74,7 +74,7 @@ tracker](https://github.com/happypeter/happygrep/issues).
 * [happypeter (原作者)](https://github.com/happypeter)
 
 * [billie66 (当前代码的最大贡献者)](https://github.com/billie66)
-* 
+
 
 ### License
 
