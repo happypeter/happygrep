@@ -1,18 +1,13 @@
 ## Simple and nice grep front-end: happygrep
 
-While `grep` is a powerful command line tool, it is difficult to use
-So for the convenient of human being, we need a more smart
-tool to do our work.
+grep is a powerful command line tool, it is difficult to use.
 
-`happygrep` is a small and nice `grep` front-end based on `ncursesw` __TUI__.
-Its internal command is `grep` used to find all the matching text line
-containing specific strings, then displaying them in the `ncursesw` window.
-So you can view the results with ease.
+`happygrep` is a small and nice `grep`  TUI front-end based on `ncursesw`.
 
 ### Installation (Ubuntu)
 
-Since the application is dependent on `ncursesw` library, so we need to
-install the library firstly, otherwise it can't be compiled successfully :
+happygrep dependends on ncursesw library, so we need to
+install the library first
 
     sudo apt-get -y install libncursesw5 libncursesw5-dev
 
