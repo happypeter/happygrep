@@ -1,4 +1,4 @@
-## Simple and nice grep front-end: happygrep
+## grep with a cute front-end: happygrep
 
 happygrep 采用 ncursesw 的 TUI 字符界面图形库，相当于 find + grep + 前端界面。
 
