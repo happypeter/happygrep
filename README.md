@@ -2,7 +2,7 @@
 
 grep is a powerful command line tool, it is difficult to use.
 
-`happygrep` is a small and nice `grep`  TUI front-end based on `ncursesw`.
+happygrep is a grep TUI front-end based on ncursesw.
 
 ### Installation (Ubuntu)
 
@@ -10,6 +10,16 @@ happygrep dependends on ncursesw library, so we need to
 install the library first
 
     sudo apt-get -y install libncursesw5 libncursesw5-dev
+    cd happygrep/
+    make
+    
+得到二进制文件 happygrep ，可以
+
+    mv happygrep ~/bin/xxx
+    
+以后就可以这样用了
+
+    xxx string
 
 ### Installation (Mac OS X)
 
@@ -77,5 +87,5 @@ tracker](https://github.com/happypeter/happygrep/issues).
 
 (The MIT license)
 
-Copyright (c) 2011 happpypeter
+Copyright (c) 2011 happypeter
 
