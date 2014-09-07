@@ -1,125 +1,28 @@
-# ACK is also very powerful
+- ack very powerful
 
-it basically does whatever I want for my xxx
+- ncurses
 
-    sudo apt-get install ack-grep
-    sudo ln -s /usr/bin/ack-grep /usr/bin/ack
-
-then in vim
-
-    :Ack xxx
-
-or maybe have this in .vimrc
-
-    map ,k :Ack <cword><ENTER>
-
-# BUG:
- 
-  xxx "word word" 
-
-does suport string with space in, the bug was fixed.
-
-## ncurses
-
-you can get ncurses api doc by moving your cursor on it and K (open man page) in vim
-
-## Regexp
-
-    .     matches any character
-    .*    matches any set of characters
-
-[0-9a-f][0-9a-f] : two hex bit
-
-	peter@bull:~$ grep [0-9a-f][0-9a-f] test 
-	12
-	aa
-	1a
-	peter@bull:~$ cat test 
-	12
-	1
-	aa
-	1a
-
-	peter@bull:~$ 
-
-find a word, case ignored
-
-	peter@bull:~$ grep -i  '\<hello\>'  dd
-	hello
-	hello my love
-	Hello
-
-## use color in bash
-
-http://webhome.csc.uvic.ca/~sae/seng265/fall04/tips/s265s047-tips/bash-using-colors.html
-
-## how to install search.vim
-
-find . -exec grep "$1" '{}' \; -print|vim -s /usr/share/vim/vim72/syntax/search.vim -
-
-# echo "text for vim" |vim -
-# read from stdout
-# find . -exec grep peter {} \; -printf "FILENAME:\n" -print|vim -
-# the above "-printf" may help with navigation in vim
-# and now I have this to avoid the items in .git/
-#
-#    find . |grep -v .git| xargs grep -in tig
-#
-#
-
-## dev note
-
-If you've configured your ncurses with --enable-sigwinch, then you can go the 
-easy way out, and just watch the characters that you get from getch() for a 
-KEY_RESIZE. When ncurses handles the SIGWINCH signal, it pushes a KEY_RESIZE 
-back onto the queue that getch() uses, so that the next call to getch() will 
-return that value. However, not everyone's ncurses library has been configured 
-with that switch, so relying on that behavior is not portable.
-
-## ncurses & Unicode
-
-The normal ncurses libraries support 8-bit characters. The ncurses library can
-also be configured (--enable-widec) to support wide-characters (for instance
-Unicode and the UTF-8 encoding). The corresponding wide-character ncursesw
-libraries are source-compatible with the normal applications. That is,
-applications must be compiled and linked against the ncursesw library.
-
-The ncurses 5.3 release provides UTF-8 support. The special cases of Linux
-console and screen were addressed in development patches completed at the end
-of 2002. 
-
-Note: the resource above from http://invisible-island.net/ncurses/ncurses.faq.html
-
-## articles about Unicode 
-
-http://www.cprogramming.com/tutorial/unicode.html
-
-http://www.cl.cam.ac.uk/~mgk25/unicode.html
-
-https://help.ubuntu.com/community/Locale
-
-http://developers.sun.com/dev/gadc/technicalpublications/articles/utf8.html
-
-http://www.tbray.org/ongoing/When/200x/2003/04/26/UTF
+  you can get ncurses api doc by moving your cursor on it and K (open man page) in vim
 
 
-for Chinese support, you need to install the `w` version of lib ncurse
+
+  If you've configured your ncurses with --enable-sigwinch, then you can go the easy way out, and just watch the characters that you get from getch() for a KEY_RESIZE. When ncurses handles the SIGWINCH signal, it pushes a KEY_RESIZE back onto the queue that getch() uses, so that the next call to getch() will return that value. However, not everyone's ncurses library has been configured with that switch, so relying on that behavior is not portable.
+
+- ncurses & Unicode
+
+  The normal ncurses libraries support 8-bit characters. The ncurses library can also be configured (--enable-widec) to support wide-characters (for instance Unicode and the UTF-8 encoding). The corresponding wide-character ncursesw libraries are source-compatible with the normal applications. That is, applications must be compiled and linked against the ncursesw library.
+
+  The ncurses 5.3 release provides UTF-8 support. The special cases of Linux console and screen were addressed in development patches completed at the end of 2002.
+
+  Note: the resource above from http://invisible-island.net/ncurses/ncurses.faq.html
+
+- Chinese support
+  you need to install the `w` version of lib ncurse
 
     sudo apt-get install libncursesw5-dev
 
-MAC:
 
-    since I do not know how to install dev headers for ncurses on mac, so I stupidly copied the 
-
-        ncurses.h
-
-    from a linux machine, and then use
-
-        gcc -I.
-
-    it sucks.
-
-### exclude multiple directories from find command
+- exclude multiple directories from find command
 
     find . -type d \( -name dir -o -name dir1 -o -name dir2 \) -prune -o -print
 
