@@ -2,6 +2,7 @@
 
 happygrep 采用 ncursesw 的 TUI 字符界面图形库，封装了常用的 unix 命令行查找操作，相当于 （ find + grep + 漂亮界面 ）。
 
+Inspired by [tig](https://github.com/jonas/tig) .
 
 ### Installation (Ubuntu)
 
