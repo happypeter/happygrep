@@ -22,7 +22,7 @@ Inspired by [tig](https://github.com/jonas/tig) .
 
 ### Installation (Mac OS X)
 
-首选，采用 [brew cask]() 安装：
+首选，采用 [brew cask](https://github.com/caskroom/homebrew-cask#lets-try-it) 安装：
 
     $ brew cask update
     $ brew cask install happygrep
