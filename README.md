@@ -22,6 +22,14 @@ Inspired by [tig](https://github.com/jonas/tig) .
 
 ### Installation (Mac OS X)
 
+首选，采用 [brew cask]() 安装：
+
+    $ brew cask update
+    $ brew cask install happygrep
+
+
+下面是手动安装方式：
+
 在我自己的 10.8.5 系统上
 
     $ brew --version
