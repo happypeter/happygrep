@@ -40,12 +40,12 @@ static void init(void);
 #define MIN(x) ((x) <= (y) ? (x) : (y))
 #define ARRAY_SIZE(x)   (sizeof(x) / sizeof(x[0]))
 
-#define SIZEOF_STR	1024	/* Default string size. */
+#define SIZEOF_STR    1024    /* Default string size. */
 
-#define ICONV_NONE	((iconv_t) -1)
+#define ICONV_NONE    ((iconv_t) -1)
 
 #ifndef ICONV_CONST
-#define ICONV_CONST	/* nothing */
+#define ICONV_CONST    /* nothing */
 #endif
 
 static char opt_encoding[20] = "UTF-8";
@@ -56,23 +56,23 @@ static int opt_tab_size = 8;
 
 /* User action requests. */
 enum request {
-	/* Offset all requests to avoid conflicts with ncurses getch values. */
-	REQ_OFFSET = KEY_MAX + 1,
+    /* Offset all requests to avoid conflicts with ncurses getch values. */
+    REQ_OFFSET = KEY_MAX + 1,
 
-	/* XXX: Keep the view request first and in sync with views[]. */
-	REQ_VIEW_MAIN,
+    /* XXX: Keep the view request first and in sync with views[]. */
+    REQ_VIEW_MAIN,
 
-	REQ_VIEW_CLOSE,
-	REQ_SCREEN_RESIZE,
-	REQ_OPEN_VIM,
+    REQ_VIEW_CLOSE,
+    REQ_SCREEN_RESIZE,
+    REQ_OPEN_VIM,
 
-	REQ_MOVE_UP,
-	REQ_MOVE_DOWN,
+    REQ_MOVE_UP,
+    REQ_MOVE_DOWN,
 };
 
 struct fileinfo {
-	char name[128];		
-	char content[128];
+    char name[128];        
+    char content[128];
     char number[6];
 };
 
@@ -122,15 +122,14 @@ get_request(int key)
 static inline void
 string_ncopy(char *dst, const char *src, int dstlen)
 {
-	strncpy(dst, src, dstlen - 1);
-	dst[dstlen - 1] = '\0';
-
+    strncpy(dst, src, dstlen - 1);
+    dst[dstlen - 1] = '\0';
 }
 
 /* Shorthand for safely copying into a fixed buffer. */
 
 #define string_copy(dst, src) \
-	string_ncopy(dst, src, sizeof(dst))
+    string_ncopy(dst, src, sizeof(dst))
 
 /*add single quotes to arguments passed by command line,
  *for example, grep '\\' test 
@@ -172,29 +171,29 @@ char* strcat1(char *dest, const char *src)
 }
 
 struct view {
-	const char *name;
+    const char *name;
 
-	/* Rendering */
+    /* Rendering */
     bool (*read)(struct view *view, char *line);
     bool (*render)(struct view *view, unsigned int lineno);
-	WINDOW *win;
-	WINDOW *title;
-	int height, width;
+    WINDOW *win;
+    WINDOW *title;
+    int height, width;
 
-	/* Navigation */
-	unsigned long offset;	/* Offset of the window top */
-	unsigned long lineno;	/* Current line number */
+    /* Navigation */
+    unsigned long offset;    /* Offset of the window top */
+    unsigned long lineno;    /* Current line number */
 
-	/* Buffering */
-	unsigned long lines;	/* Total number of lines */
-	void **line;		/* Line index */
+    /* Buffering */
+    unsigned long lines;    /* Total number of lines */
+    void **line;        /* Line index */
     const char *cmd;
 
     /* filename */
     char file[BUFSIZ];
 
-	/* Loading */
-	FILE *pipe;
+    /* Loading */
+    FILE *pipe;
 };
 
 static int view_driver(struct view *view, int key);
@@ -242,7 +241,7 @@ static char vim_cmd[BUFSIZ];
 LINE(DEFAULT,       "",     COLOR_DEFAULT,  COLOR_DEFAULT,  A_NORMAL), \
 LINE(CURSOR,        "",     COLOR_WHITE,    COLOR_GREEN,    A_BOLD), \
 LINE(STATUS,        "",     COLOR_GREEN,    COLOR_DEFAULT,  0), \
-LINE(DELIMITER,	    "",		COLOR_MAGENTA,	COLOR_DEFAULT,	0), \
+LINE(DELIMITER,        "",        COLOR_MAGENTA,    COLOR_DEFAULT,    0), \
 LINE(TITLE_FOCUS,   "",     COLOR_WHITE,    COLOR_BLUE,     A_BOLD), \
 LINE(FILE_NAME,     "",     COLOR_BLUE,     COLOR_DEFAULT,  0), \
 LINE(FILE_LINUM,    "",     COLOR_GREEN,    COLOR_DEFAULT,  0), \
@@ -340,7 +339,7 @@ int parse_options(int argc, const char *argv[])
 
 int main(int argc, const char *argv[])
 {
-	const char *codeset = "UTF-8";
+    const char *codeset = "UTF-8";
     /* c must be int not char, because the maximum value of KEY_RESIZE is 632. */
     int c;
     enum request request; 
@@ -351,25 +350,25 @@ int main(int argc, const char *argv[])
 
     signal(SIGINT, quit);
 
-	if (setlocale(LC_ALL, "")) {
-		codeset = nl_langinfo(CODESET);
-	}
+    if (setlocale(LC_ALL, "")) {
+        codeset = nl_langinfo(CODESET);
+    }
 
-	if (*opt_encoding && strcmp(codeset, "UTF-8")) {
-		opt_iconv_in = iconv_open("UTF-8", opt_encoding);
-		if (opt_iconv_in == ICONV_NONE)
-			die("Failed to initialize character set conversion");
-	}
+    if (*opt_encoding && strcmp(codeset, "UTF-8")) {
+        opt_iconv_in = iconv_open("UTF-8", opt_encoding);
+        if (opt_iconv_in == ICONV_NONE)
+            die("Failed to initialize character set conversion");
+    }
 
-	if (codeset && strcmp(codeset, "UTF-8")) {
-		opt_iconv_out = iconv_open(codeset, "UTF-8");
-		if (opt_iconv_out == ICONV_NONE)
-			die("Failed to initialize character set conversion");
-	}
+    if (codeset && strcmp(codeset, "UTF-8")) {
+        opt_iconv_out = iconv_open(codeset, "UTF-8");
+        if (opt_iconv_out == ICONV_NONE)
+            die("Failed to initialize character set conversion");
+    }
     
-	init();
+    init();
             
-	while (view_driver(display[current_view], request)) 
+    while (view_driver(display[current_view], request)) 
     {
         int i;
 
@@ -391,7 +390,7 @@ int main(int argc, const char *argv[])
         }
     }
 
-	quit(0);
+    quit(0);
 
     return 0;
 }
@@ -446,8 +445,8 @@ static bool begin_update(struct view *view)
 
 static void end_update(struct view *view)
 {
-	pclose(view->pipe);
-	view->pipe = NULL;
+    pclose(view->pipe);
+    view->pipe = NULL;
 }
 
 static inline int get_line_attr(enum line_type type)
@@ -495,14 +494,14 @@ static void init(void)
     if (!cursed)
         die("Failed to initialize curses");
 
-	nonl();         /* tell curses not to do NL->CR/NL on output */
-	cbreak();       /* take input chars one at a time, no wait for \n */
-	noecho();       /* don't echo input */
+    nonl();         /* tell curses not to do NL->CR/NL on output */
+    cbreak();       /* take input chars one at a time, no wait for \n */
+    noecho();       /* don't echo input */
     leaveok(stdscr, TRUE);
 
-	if (has_colors())
+    if (has_colors())
     {
-		init_colors();
+        init_colors();
     }
 
     getmaxyx(stdscr, y, x);
@@ -587,34 +586,34 @@ static void redraw_display(bool clear)
 
 static int update_view(struct view *view)
 {
-	char buffer[BUFSIZ];
-	char *line;
-	void **tmp;
-	int redraw_from = -1;
-	unsigned long lines = view->height;
+    char buffer[BUFSIZ];
+    char *line;
+    void **tmp;
+    int redraw_from = -1;
+    unsigned long lines = view->height;
     char *top = "Binary file";
     char delimiter = ':';
 
-	if (!view->pipe)
-		return TRUE;
+    if (!view->pipe)
+        return TRUE;
 
-	/* Only redraw if lines are visible. */
-	if (view->offset + view->height >= view->lines)
-		redraw_from = view->lines - view->offset;
+    /* Only redraw if lines are visible. */
+    if (view->offset + view->height >= view->lines)
+        redraw_from = view->lines - view->offset;
 
-	tmp = realloc(view->line, sizeof(*view->line) * (view->lines + lines));
-	if (!tmp)
-		goto alloc_error;
+    tmp = realloc(view->line, sizeof(*view->line) * (view->lines + lines));
+    if (!tmp)
+        goto alloc_error;
 
-	view->line = tmp;
+    view->line = tmp;
 
-	while ((line = fgets(buffer, sizeof(buffer), view->pipe))) 
+    while ((line = fgets(buffer, sizeof(buffer), view->pipe))) 
     {
-		int linelen;
-		linelen = strlen(line);
+        int linelen;
+        linelen = strlen(line);
 
-		if (linelen)
-			line[linelen - 1] = 0;
+        if (linelen)
+            line[linelen - 1] = 0;
 
         if(!strncmp(line, top, strlen(top))) 
             continue;
@@ -623,55 +622,55 @@ static int update_view(struct view *view)
         if(!strchr(line, delimiter))  
             continue;                   
 
-		if (!view->read(view, line))
-			goto alloc_error;
+        if (!view->read(view, line))
+            goto alloc_error;
 
-		if (lines-- == 1)
-			break;
-	}
+        if (lines-- == 1)
+            break;
+    }
 
-	if (redraw_from >= 0) {
-		/* If this is an incremental update, redraw the previous line
-		 * since for commits some members could have changed when
-		 * loading the main view. */
-		if (redraw_from > 0)
-			redraw_from--;
+    if (redraw_from >= 0) {
+        /* If this is an incremental update, redraw the previous line
+         * since for commits some members could have changed when
+         * loading the main view. */
+        if (redraw_from > 0)
+            redraw_from--;
 
-		/* Incrementally draw avoids flickering. */
-		redraw_view_from(view, redraw_from);
-	}
+        /* Incrementally draw avoids flickering. */
+        redraw_view_from(view, redraw_from);
+    }
 
-	update_title_win(view);
+    update_title_win(view);
 
-	if (ferror(view->pipe)) {
-		printw("Failed to read %s", view->cmd);
-		goto end;
+    if (ferror(view->pipe)) {
+        printw("Failed to read %s", view->cmd);
+        goto end;
 
-	} else if (feof(view->pipe)) {
+    } else if (feof(view->pipe)) {
         report("load %d lines", view->lines);
-		goto end;
-	}
+        goto end;
+    }
 
-	return TRUE;
+    return TRUE;
 
 alloc_error:
-	printw("Allocation failure");
+    printw("Allocation failure");
 
 end:
-	end_update(view);
-	return FALSE;
+    end_update(view);
+    return FALSE;
 }
 
 static void redraw_view_from(struct view *view, int lineno)
 {
-	assert(0 <= lineno && lineno < view->height);
+    assert(0 <= lineno && lineno < view->height);
 
-	for (; lineno < view->height; lineno++) {
-		view->render(view, lineno);
-	}
+    for (; lineno < view->height; lineno++) {
+        view->render(view, lineno);
+    }
 
-	redrawwin(view->win);
-	wrefresh(view->win);
+    redrawwin(view->win);
+    wrefresh(view->win);
 }
 
 static void redraw_view(struct view *view)
@@ -740,28 +739,28 @@ static char *blankspace(const char *fname)
 static inline size_t
 string_expand(char *dst, size_t dstlen, const char *src, int tabsize)
 {
-	size_t size, pos;
+    size_t size, pos;
 
-	for (size = pos = 0; size < dstlen - 1 && src[pos]; pos++) {
-		if (src[pos] == '\t') {
-			size_t expanded = tabsize - (size % tabsize);
+    for (size = pos = 0; size < dstlen - 1 && src[pos]; pos++) {
+        if (src[pos] == '\t') {
+            size_t expanded = tabsize - (size % tabsize);
 
-			if (expanded + size >= dstlen - 1)
-				expanded = dstlen - size - 1;
-			memcpy(dst + size, "        ", expanded);
-			size += expanded;
-		} else {
-			dst[size++] = src[pos];
-		}
-	}
+            if (expanded + size >= dstlen - 1)
+                expanded = dstlen - size - 1;
+            memcpy(dst + size, "        ", expanded);
+            size += expanded;
+        } else {
+            dst[size++] = src[pos];
+        }
+    }
 
-	dst[size] = 0;
-	return pos;
+    dst[size] = 0;
+    return pos;
 }
         
 static bool default_read(struct view *view, char *line)
 {
-	struct fileinfo *fileinfo;
+    struct fileinfo *fileinfo;
     char *end;
 
     fileinfo= calloc(1, sizeof(struct fileinfo));
@@ -772,7 +771,7 @@ static bool default_read(struct view *view, char *line)
     view->line[view->lines++] = fileinfo;
     string_copy(fileinfo->name, strsplit(line, ':'));
 
-	end = strchr(line, ':');
+    end = strchr(line, ':');
     end += 1;
     string_copy(fileinfo->number, strsplit(end, ':'));
 
@@ -787,66 +786,66 @@ static bool default_read(struct view *view, char *line)
 
 static bool default_render(struct view *view, unsigned int lineno)
 {
-	struct fileinfo *fileinfo;
-	enum line_type type;
-	int col = 0;
-	size_t namelen;
+    struct fileinfo *fileinfo;
+    enum line_type type;
+    int col = 0;
+    size_t namelen;
     char *fname, *fnumber;
     int opt_file_name = 25;
-	char text[SIZEOF_STR];
+    char text[SIZEOF_STR];
 
-	if (view->offset + lineno >= view->lines)
-		return false;
+    if (view->offset + lineno >= view->lines)
+        return false;
 
-	fileinfo = view->line[view->offset + lineno];
-	if (!*fileinfo->name)
-		return false;
+    fileinfo = view->line[view->offset + lineno];
+    if (!*fileinfo->name)
+        return false;
 
     fnumber = fileinfo->number;
     fname = blankspace(fileinfo->name);
-	wmove(view->win, lineno, col);
+    wmove(view->win, lineno, col);
 
-	if (view->offset + lineno == view->lineno) {
+    if (view->offset + lineno == view->lineno) {
         snprintf(vim_cmd, sizeof(vim_cmd), VIM_CMD, fnumber, fname);
-		type = LINE_CURSOR;
-		wattrset(view->win, get_line_attr(type));
-		wchgat(view->win, -1, 0, type, NULL);
+        type = LINE_CURSOR;
+        wattrset(view->win, get_line_attr(type));
+        wchgat(view->win, -1, 0, type, NULL);
         string_copy(view->file, fileinfo->name);
 
-	} else {
-		type = LINE_FILE_LINCON;
+    } else {
+        type = LINE_FILE_LINCON;
         wchgat(view->win, -1, 0, type, NULL);
-		wattrset(view->win, get_line_attr(LINE_FILE_NAME));
-	}
+        wattrset(view->win, get_line_attr(LINE_FILE_NAME));
+    }
 
     namelen = strlen(fileinfo->name);
     if (namelen > opt_file_name){
         int n = namelen-opt_file_name;
-	    if (type != LINE_CURSOR)
+        if (type != LINE_CURSOR)
             wattrset(view->win, get_line_attr(LINE_DELIMITER));
         waddch(view->win, '~');
-	    if (type != LINE_CURSOR)
+        if (type != LINE_CURSOR)
             wattrset(view->win, get_line_attr(LINE_FILE_NAME));
-    	waddnstr(view->win, fileinfo->name + n, opt_file_name);
+        waddnstr(view->win, fileinfo->name + n, opt_file_name);
     }
     else
         waddstr(view->win, fileinfo->name);
 
     col += opt_file_name + 2;
-	wmove(view->win, lineno, col);
-	if (type != LINE_CURSOR)
-		wattrset(view->win, get_line_attr(LINE_FILE_LINUM));
+    wmove(view->win, lineno, col);
+    if (type != LINE_CURSOR)
+        wattrset(view->win, get_line_attr(LINE_FILE_LINUM));
 
-	waddstr(view->win, fileinfo->number);
+    waddstr(view->win, fileinfo->number);
 
     col += 9;
-	if (type != LINE_CURSOR)
-		wattrset(view->win, A_NORMAL);
+    if (type != LINE_CURSOR)
+        wattrset(view->win, A_NORMAL);
 
-	wmove(view->win, lineno, col);
+    wmove(view->win, lineno, col);
 
-	if (type != LINE_CURSOR)
-		wattrset(view->win, get_line_attr(type));
+    if (type != LINE_CURSOR)
+        wattrset(view->win, get_line_attr(type));
 
     int contentlen = strlength(fileinfo->content);
     string_expand(text, sizeof(text), fileinfo->content, opt_tab_size);
@@ -866,7 +865,7 @@ static bool default_render(struct view *view, unsigned int lineno)
         waddstr(view->win, fileinfo->content);
     }
 
-	return TRUE;
+    return TRUE;
 }
 
 static void open_view(struct view *prev)
@@ -900,14 +899,14 @@ static void open_view(struct view *prev)
 
 static int view_driver(struct view *view, int key)
 {
-	switch (key) 
+    switch (key) 
     {
-	case REQ_MOVE_DOWN:
-	case REQ_MOVE_UP:
-		if (view)
-			navigate_view(view, key);
-		break;
-	case REQ_VIEW_CLOSE:
+    case REQ_MOVE_DOWN:
+    case REQ_MOVE_UP:
+        if (view)
+            navigate_view(view, key);
+        break;
+    case REQ_VIEW_CLOSE:
         quit(0);
         break;
     case REQ_OPEN_VIM:
@@ -926,11 +925,11 @@ static int view_driver(struct view *view, int key)
         redraw_display(TRUE);
         break;
 
-	default:
-		return TRUE;
-	}
+    default:
+        return TRUE;
+    }
 
-	return TRUE;
+    return TRUE;
 }
 
 static void report(const char *msg, ...)
@@ -964,74 +963,74 @@ static void report(const char *msg, ...)
 
 static void navigate_view(struct view *view, int request)
 {
-	int steps;
+    int steps;
 
-	switch (request) {
+    switch (request) {
 
-	case REQ_MOVE_UP:
-		steps = -1;
-		break;
+    case REQ_MOVE_UP:
+        steps = -1;
+        break;
 
-	case REQ_MOVE_DOWN:
-		steps = 1;
-		break;
-	}
+    case REQ_MOVE_DOWN:
+        steps = 1;
+        break;
+    }
 
-	if (steps <= 0 && view->lineno == 0) {
-		report("already at first line");
-		return;
+    if (steps <= 0 && view->lineno == 0) {
+        report("already at first line");
+        return;
 
-	} else if (steps >= 0 && view->lineno + 1 == view->lines) {
-		report("already at last line");
-		return;
-	}
+    } else if (steps >= 0 && view->lineno + 1 == view->lines) {
+        report("already at last line");
+        return;
+    }
 
-	/* Move the current line */
-	view->lineno += steps;
-	assert(0 <= view->lineno && view->lineno < view->lines);
+    /* Move the current line */
+    view->lineno += steps;
+    assert(0 <= view->lineno && view->lineno < view->lines);
 
-	/* Repaint the old "current" line if we be scrolling */
+    /* Repaint the old "current" line if we be scrolling */
     view->render(view, view->lineno - steps - view->offset);
 
-	/* Check whether the view needs to be scrolled */
-	if (view->lineno < view->offset ||
-	    view->lineno >= view->offset + view->height) 
+    /* Check whether the view needs to be scrolled */
+    if (view->lineno < view->offset ||
+        view->lineno >= view->offset + view->height) 
     {
-		if (steps < 0 && -steps > view->offset) 
+        if (steps < 0 && -steps > view->offset) 
         {
-			steps = -view->offset;
-		} 
+            steps = -view->offset;
+        } 
         else if (steps > 0) 
         {
-			if (view->lineno == view->lines - 1 &&
-			    view->lines > view->height) 
+            if (view->lineno == view->lines - 1 &&
+                view->lines > view->height) 
             {
-				steps = view->lines - view->offset - 1;
-				if (steps >= view->height)
+                steps = view->lines - view->offset - 1;
+                if (steps >= view->height)
                 {
-					steps -= view->height - 1;
+                    steps -= view->height - 1;
                 }
-			}
-		}
+            }
+        }
         move_view(view, steps); 
-		return;
-	}
+        return;
+    }
    
-	/* Draw the current line */
-	view->render(view, view->lineno - view->offset);
+    /* Draw the current line */
+    view->render(view, view->lineno - view->offset);
 
-	redrawwin(view->win);
-	wrefresh(view->win);
-	update_title_win(view);
+    redrawwin(view->win);
+    wrefresh(view->win);
+    update_title_win(view);
 }
 
 static void move_view(struct view *view, int lines)
 {
-	/* The rendering expects the new offset. */
-	view->offset += lines;
+    /* The rendering expects the new offset. */
+    view->offset += lines;
 
-	assert(0 <= view->offset && view->offset < view->lines);
-	assert(lines);
+    assert(0 <= view->offset && view->offset < view->lines);
+    assert(lines);
 
     int line = lines > 0 ? view->height - lines : 0;
     int end = line + (lines > 0 ? lines : -lines);
@@ -1044,24 +1043,24 @@ static void move_view(struct view *view, int lines)
             break;
     }
 
-	/* Move current line into the view. */
-	if (view->lineno < view->offset) 
+    /* Move current line into the view. */
+    if (view->lineno < view->offset) 
     {
-		view->lineno = view->offset;
-		view->render(view, 0);
+        view->lineno = view->offset;
+        view->render(view, 0);
 
-	} 
+    } 
     else if (view->lineno >= view->offset + view->height) 
     {
-		view->lineno = view->offset + view->height - 1;
-		view->render(view, view->lineno - view->offset);
-	}
+        view->lineno = view->offset + view->height - 1;
+        view->render(view, view->lineno - view->offset);
+    }
 
-	assert(view->offset <= view->lineno && view->lineno < view->lines);
+    assert(view->offset <= view->lineno && view->lineno < view->lines);
 
-	redrawwin(view->win);
-	wrefresh(view->win);
+    redrawwin(view->win);
+    wrefresh(view->win);
 
-	update_title_win(view);
+    update_title_win(view);
 }
 
