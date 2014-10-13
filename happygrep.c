@@ -123,7 +123,7 @@ static inline void
 string_ncopy(char *dst, const char *src, int dstlen)
 {
 	strncpy(dst, src, dstlen - 1);
-	dst[dstlen] = '\0';
+	dst[dstlen - 1] = '\0';
 
 }
 
