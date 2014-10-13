@@ -22,7 +22,7 @@ static void init(void);
 
 /* annoying is the "\\" escape sign, why double? C string needs one for "\" and
  bash needs another for "(", "!" and ")". */
- 
+
 #define FIND_CMD \
 "find . \\( -name '.?*' -o -name tags \\) -prune -o -exec grep -in %s {} +"
 
@@ -32,7 +32,7 @@ static void init(void);
 /* There must be no space between + and %s.*/
 #define VIM_CMD  "vim +%s %s"
 
-#define VERSION  "happygrep v1.0" 
+#define VERSION  "happygrep v1.0"
 
 #define COLOR_DEFAULT  (-1)
 
@@ -71,7 +71,7 @@ enum request {
 };
 
 struct fileinfo {
-    char name[128];        
+    char name[128];
     char content[128];
     char number[6];
 };
@@ -132,7 +132,7 @@ string_ncopy(char *dst, const char *src, int dstlen)
     string_ncopy(dst, src, sizeof(dst))
 
 /*add single quotes to arguments passed by command line,
- *for example, grep '\\' test 
+ *for example, grep '\\' test
  *to find lines containing backslashes in the file named test.
  *If use double quotes, the command above will probably evaluate not run.
  **/
@@ -213,8 +213,8 @@ static void resize_display(void);
 /* declaration end */
 
 static struct view main_view = {
-    "main", 
-    default_read, 
+    "main",
+    default_read,
     default_render,
 };
 
@@ -226,7 +226,7 @@ static unsigned int current_view;
     for (i = 0; i < ARRAY_SIZE(display) && (view = display[i]); i++)
 
 static bool cursed = false;
-static WINDOW *status_win; 
+static WINDOW *status_win;
 static char fmt_cmd[BUFSIZ];
 static char vim_cmd[BUFSIZ];
 
@@ -241,7 +241,7 @@ static char vim_cmd[BUFSIZ];
 LINE(DEFAULT,       "",     COLOR_DEFAULT,  COLOR_DEFAULT,  A_NORMAL), \
 LINE(CURSOR,        "",     COLOR_WHITE,    COLOR_GREEN,    A_BOLD), \
 LINE(STATUS,        "",     COLOR_GREEN,    COLOR_DEFAULT,  0), \
-LINE(DELIMITER,        "",        COLOR_MAGENTA,    COLOR_DEFAULT,    0), \
+LINE(DELIMITER,     "",     COLOR_MAGENTA,  COLOR_DEFAULT,  0), \
 LINE(TITLE_FOCUS,   "",     COLOR_WHITE,    COLOR_BLUE,     A_BOLD), \
 LINE(FILE_NAME,     "",     COLOR_BLUE,     COLOR_DEFAULT,  0), \
 LINE(FILE_LINUM,    "",     COLOR_GREEN,    COLOR_DEFAULT,  0), \
@@ -295,8 +295,8 @@ int parse_options(int argc, const char *argv[])
 
     if (argc <= 1 || argc == 3 || argc >4) {
         printf("happygrep: invalid number of arguments.\n\n");
-        exit(1); 
-    } 
+        exit(1);
+    }
 
     if (argc == 2) {
         if (!strcmp(argv[1], "--help")) {
@@ -342,9 +342,9 @@ int main(int argc, const char *argv[])
     const char *codeset = "UTF-8";
     /* c must be int not char, because the maximum value of KEY_RESIZE is 632. */
     int c;
-    enum request request; 
-    request = REQ_VIEW_MAIN; 
-    struct view *view; 
+    enum request request;
+    request = REQ_VIEW_MAIN;
+    struct view *view;
 
     parse_options(argc, argv);
 
@@ -365,19 +365,19 @@ int main(int argc, const char *argv[])
         if (opt_iconv_out == ICONV_NONE)
             die("Failed to initialize character set conversion");
     }
-    
+
     init();
-            
-    while (view_driver(display[current_view], request)) 
+
+    while (view_driver(display[current_view], request))
     {
         int i;
 
         foreach_view (view, i)
             update_view(view);
 
-        c = wgetch(status_win);     
+        c = wgetch(status_win);
         request = get_request(c);
-        
+
         if ( request == REQ_SCREEN_RESIZE) {
 
             int height, width;
@@ -526,10 +526,10 @@ static void update_title_win(struct view *view)
     wprintw(view->title, "[RPathN]");
     wmove(view->title, 0, 9);
     waddstr(view->title, view->file);
-    len = strlen(view->file); 
+    len = strlen(view->file);
     wmove(view->title, 0, len + 13);
 
-    if (view->lines) { 
+    if (view->lines) {
         wprintw(view->title, "line %d of %d (%d%%)",
             view->lineno + 1,
             view->lines,
@@ -547,7 +547,7 @@ static void resize_display(void)
     /* Setup window dimensions */
 
     getmaxyx(stdscr, base->height, base->width);
-    
+
     base->height -= 1; // space for status window
 
     base->height -= 1; // space for title bar
@@ -607,7 +607,7 @@ static int update_view(struct view *view)
 
     view->line = tmp;
 
-    while ((line = fgets(buffer, sizeof(buffer), view->pipe))) 
+    while ((line = fgets(buffer, sizeof(buffer), view->pipe)))
     {
         int linelen;
         linelen = strlen(line);
@@ -615,12 +615,12 @@ static int update_view(struct view *view)
         if (linelen)
             line[linelen - 1] = 0;
 
-        if(!strncmp(line, top, strlen(top))) 
+        if(!strncmp(line, top, strlen(top)))
             continue;
 
         /* solve the segfault in ubuntu with chinese locale. */
-        if(!strchr(line, delimiter))  
-            continue;                   
+        if(!strchr(line, delimiter))
+            continue;
 
         if (!view->read(view, line))
             goto alloc_error;
@@ -690,7 +690,7 @@ static char *strsplit(const char *line, const char c)
         word[i++] = *line;
         line++;
     }
-    word[i] = '\0'; 
+    word[i] = '\0';
     return word;
 }
 
@@ -709,18 +709,18 @@ static int strlength(const char *term)
     return length;
 }
 
-/* when a file name containing blankspace, vim will consider 
- * it as more than one file, in order to fix this problem, 
- * so the function below renames the filename using '\ ' 
+/* when a file name containing blankspace, vim will consider
+ * it as more than one file, in order to fix this problem,
+ * so the function below renames the filename using '\ '
  * to instead of ' ', then vim can read the file.
  */
 static char *blankspace(const char *fname)
 {
-    const char *tmp = fname; 
+    const char *tmp = fname;
     int i, j;
     static char localname[512];
     int len = strlen(tmp);
-    
+
     memset(localname, 0, sizeof(localname));
     for (i = 0, j = 0; j < len; tmp++, j++)
     {
@@ -757,7 +757,7 @@ string_expand(char *dst, size_t dstlen, const char *src, int tabsize)
     dst[size] = 0;
     return pos;
 }
-        
+
 static bool default_read(struct view *view, char *line)
 {
     struct fileinfo *fileinfo;
@@ -777,7 +777,7 @@ static bool default_read(struct view *view, char *line)
 
     end = strchr(end, ':');
     end += 1;
-    while (isspace(*end)) 
+    while (isspace(*end))
         end++;
     string_copy(fileinfo->content, end);
 
@@ -861,7 +861,7 @@ static bool default_render(struct view *view, unsigned int lineno)
             waddch(view->win, '~');
         }
     }
-    else { 
+    else {
         waddstr(view->win, fileinfo->content);
     }
 
@@ -876,7 +876,7 @@ static void open_view(struct view *prev)
         report("Already in %s view", view->name);
         return;
     }
-    
+
     if (!begin_update(view)) {
         report("Failed to load %s view", view->name);
         return;
@@ -885,7 +885,7 @@ static void open_view(struct view *prev)
     /* Maximize the current view. */
     memset(display, 0, sizeof(display));
     current_view = 0;
-    display[current_view] = view; 
+    display[current_view] = view;
 
     resize_display();
 
@@ -899,14 +899,14 @@ static void open_view(struct view *prev)
 
 static int view_driver(struct view *view, int key)
 {
-    switch (key) 
+    switch (key)
     {
-    case REQ_MOVE_DOWN:
-    case REQ_MOVE_UP:
-        if (view)
-            navigate_view(view, key);
-        break;
-    case REQ_VIEW_CLOSE:
+        case REQ_MOVE_DOWN:
+        case REQ_MOVE_UP:
+            if (view)
+                navigate_view(view, key);
+            break;
+        case REQ_VIEW_CLOSE:
         quit(0);
         break;
     case REQ_OPEN_VIM:
@@ -917,7 +917,7 @@ static int view_driver(struct view *view, int key)
         report("returned");        /* prepare return message */
         reset_prog_mode();         /* return to the previous tty modes */
         break;
-    case REQ_VIEW_MAIN: 
+    case REQ_VIEW_MAIN:
         open_view(view);
         break;
     case REQ_SCREEN_RESIZE:
@@ -954,11 +954,11 @@ static void report(const char *msg, ...)
         va_end(args);
     }
     update_title_win(view);
-    
+
     if (view->lines) {
         wmove(view->win, view->lineno - view->offset, view->width - 1);
         wrefresh(view->win);
-    } 
+    }
 }
 
 static void navigate_view(struct view *view, int request)
@@ -994,16 +994,16 @@ static void navigate_view(struct view *view, int request)
 
     /* Check whether the view needs to be scrolled */
     if (view->lineno < view->offset ||
-        view->lineno >= view->offset + view->height) 
+        view->lineno >= view->offset + view->height)
     {
-        if (steps < 0 && -steps > view->offset) 
+        if (steps < 0 && -steps > view->offset)
         {
             steps = -view->offset;
-        } 
-        else if (steps > 0) 
+        }
+        else if (steps > 0)
         {
             if (view->lineno == view->lines - 1 &&
-                view->lines > view->height) 
+                view->lines > view->height)
             {
                 steps = view->lines - view->offset - 1;
                 if (steps >= view->height)
@@ -1012,10 +1012,10 @@ static void navigate_view(struct view *view, int request)
                 }
             }
         }
-        move_view(view, steps); 
+        move_view(view, steps);
         return;
     }
-   
+
     /* Draw the current line */
     view->render(view, view->lineno - view->offset);
 
@@ -1037,20 +1037,20 @@ static void move_view(struct view *view, int lines)
 
     wscrl(view->win, lines);
 
-    for (; line < end; line++) 
+    for (; line < end; line++)
     {
         if (!view->render(view, line))
             break;
     }
 
     /* Move current line into the view. */
-    if (view->lineno < view->offset) 
+    if (view->lineno < view->offset)
     {
         view->lineno = view->offset;
         view->render(view, 0);
 
-    } 
-    else if (view->lineno >= view->offset + view->height) 
+    }
+    else if (view->lineno >= view->offset + view->height)
     {
         view->lineno = view->offset + view->height - 1;
         view->render(view, view->lineno - view->offset);
