@@ -272,8 +272,8 @@ static const char usage[] =
 "Usage: happygrep [option1] PATTERN\n"
 "   or: happygrep PATTERN [option2] DIR|FILE\n"
 "\n"
-"Search for PATTERN in the current directory, by default exclude all the hidden \
-files and the file named tags. PATTERN can support the basic regex. \
+"Search for PATTERN in the current directory, by default exclude all the hidden\n\
+files and the file named tags. PATTERN can support the basic regex.\n\
 When use option2 switch, you can specify a DIR|FILE to be ignored.\n"
 "\n"
 "Option1:\n"
@@ -295,8 +295,9 @@ int parse_options(int argc, const char *argv[])
 
     if (argc <= 1 || argc == 3 || argc >4) {
         printf("happygrep: invalid number of arguments.\n\n");
-        exit(1);
-    }
+        printf("%s\n", usage);
+        exit(1); 
+    } 
 
     if (argc == 2) {
         if (!strcmp(argv[1], "--help")) {
