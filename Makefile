@@ -1,5 +1,5 @@
 all:
-	gcc happygrep.c -o happygrep -lncursesw  -Wall
+	gcc happygrep.c -o happygrep -lncursesw
 
 install:
 	mv happygrep /bin
