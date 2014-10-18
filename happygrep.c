@@ -865,6 +865,7 @@ static bool default_render(struct view *view, unsigned int lineno)
     else {
         waddstr(view->win, fileinfo->content);
     }
+    report("");
 
     return TRUE;
 }
