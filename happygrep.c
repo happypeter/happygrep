@@ -900,16 +900,16 @@ static void open_view(struct view *prev)
 
 static int view_driver(struct view *view, int key)
 {
-    switch (key)
-    {
-        case REQ_MOVE_DOWN:
-        case REQ_MOVE_UP:
-            if (view)
-                navigate_view(view, key);
-            break;
-        case REQ_VIEW_CLOSE:
+    switch (key) {
+    case REQ_MOVE_DOWN:
+    case REQ_MOVE_UP:
+        if (view)
+            navigate_view(view, key);
+        break;
+    case REQ_VIEW_CLOSE:
         quit(0);
         break;
+
     case REQ_OPEN_VIM:
         report("Shelling out...");
         def_prog_mode();           /* save current tty modes */
@@ -918,9 +918,11 @@ static int view_driver(struct view *view, int key)
         report("returned");        /* prepare return message */
         reset_prog_mode();         /* return to the previous tty modes */
         break;
+
     case REQ_VIEW_MAIN:
         open_view(view);
         break;
+
     case REQ_SCREEN_RESIZE:
         resize_display();
         redraw_display(TRUE);
@@ -967,7 +969,6 @@ static void navigate_view(struct view *view, int request)
     int steps;
 
     switch (request) {
-
     case REQ_MOVE_UP:
         steps = -1;
         break;
