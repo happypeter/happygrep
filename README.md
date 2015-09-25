@@ -51,6 +51,17 @@ Inspired by [tig](https://github.com/jonas/tig) .
 
     gcc happygrep.c  -I/usr/local/opt/libiconv/include -I/usr/local/opt/ncurses/include -L/usr/local/opt/libiconv/lib -L/usr/local/opt/ncurses/lib -o happygrep -lncursesw  -liconv -Wall
 
+
+UPDATE: 在 Yosemite 10.10.5 系统上 brew cask 中的版本是不行的，因为二进制依赖于 ncurse5 ，而 Yosemite 上是 6 。可以采用下面的安装步骤
+
+```
+$ brew install homebrew/dupes/ncurses
+$ git clone happygrep
+$ make -f Makefile.macosx
+```
+
+这样就成功了。
+
 ### Usage
 
 happygrep 会默认忽略 `.git` 目录. 另外也可以通过 -i 参数指定另一个要忽略的目录，例如
